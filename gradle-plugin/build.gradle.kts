@@ -16,6 +16,18 @@ gradlePlugin {
     }
 }
 
+publishing {
+    publications {
+        register("mavenPublish", MavenPublication::class.java) {
+            groupId = "family.amma"
+            artifactId = "deepLinks"
+            version = "0.1.0"
+
+            from(components.getByName("java"))
+        }
+    }
+}
+
 sourceSets {
     val main by getting {
         java.srcDirs("src/main/kotlin")

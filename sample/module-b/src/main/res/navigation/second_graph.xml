@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/included_graph"
+    app:startDestination="@id/secondFragment">
+
+    <fragment
+        android:id="@+id/secondFragment"
+        android:name="family.amma.module_b.SecondFragment"
+        android:label="FooBazz"
+        tools:layout="@layout/fragment_second">
+
+        <argument
+            android:name="isEditMode"
+            app:argType="boolean" />
+
+        <argument
+            android:name="id"
+            app:argType="integer"
+            android:defaultValue="10" />
+
+        <argument
+            android:name="data"
+            app:argType="string"
+            android:defaultValue="fooBar"
+            app:nullable="true" />
+
+        <deepLink
+            android:id="@+id/fooBar"
+            app:uri="http://www.example.com/users/{id}?isEditMode={isEditMode}&amp;data={data}" />
+
+    </fragment>
+</navigation>
