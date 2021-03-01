@@ -17,23 +17,27 @@ private const val PLUGIN_PATH = "$PLUGIN_DIRNAME/src/main/kotlin"
 @Suppress("unused")
 class DeepLinksPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        project.extensions.create(DeepLinksPluginExtension.NAME, DeepLinksPluginExtension::class.java)
+        val pluginExtension = project.extensions.create(DeepLinksPluginExtension.NAME, DeepLinksPluginExtension::class.java)
+
         val baseExtension = project.extensions.findByType(BaseExtension::class.java)
             ?: throw GradleException("deep links plugin must be used with android plugin")
         val outputDir = File(project.rootDir, PLUGIN_PATH)
+        val pluginDir = File(project.rootDir, PLUGIN_DIRNAME)
+        val buildDir = File(project.buildDir, GENERATED_PATH)
+
         forEachVariants(baseExtension) { variant: BaseVariant ->
-            val buildDir = File(project.buildDir, GENERATED_PATH)
-            val task = project
+            val generateDeepLinksTask = project
                 .tasks
-                .create("generateDeepLinks${variant.name.capitalize()}", ArgumentsGenerationTask::class.java) { task ->
+                .create("generateDeepLinks${variant.name.capitalize()}", GenerateDeepLinksTask::class.java) { task ->
                     task.rFilePackage = variant.rFilePackage()
                     task.applicationId = variant.applicationId
+                    task.generatorParams = pluginExtension.toGeneratorParams()
                     task.navigationFiles = navigationFiles(variant)
                     task.outputDir = outputDir
-                    task.pluginDir = File(project.rootDir, PLUGIN_DIRNAME)
+                    task.pluginDir = pluginDir
                     task.buildDir = buildDir
                 }
-            variant.registerJavaGeneratingTask(task, buildDir)
+            variant.registerJavaGeneratingTask(generateDeepLinksTask, buildDir)
         }
     }
 }

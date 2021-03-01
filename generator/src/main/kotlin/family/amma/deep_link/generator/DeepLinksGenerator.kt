@@ -11,12 +11,13 @@ import family.amma.deep_link.generator.fileSpec.deepLinksFileSpecByDestinations
 import family.amma.deep_link.generator.fileSpec.deepLinksFileSpecHierarchy
 import java.io.File
 import java.io.FileReader
+import java.io.Serializable
 
 data class GeneratorParams(
     val generateByDestinations: Boolean,
     val generateUriHierarchy: Boolean,
     val generateAdditionalInfo: Boolean
-)
+) : Serializable
 
 fun generateDeepLinks(
     rFilePackage: String,

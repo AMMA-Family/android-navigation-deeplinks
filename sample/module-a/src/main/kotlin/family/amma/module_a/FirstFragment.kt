@@ -25,7 +25,7 @@ class FirstFragment : Fragment(R.layout.fragment_first) {
             val deepLink = if (Random.nextBoolean()) {
                 SecondFragmentDeepLink.BarFoo(id, isEditMode)
             } else {
-                ModuleB.Http.WwwExampleCom.Users.BarFooDeepLink(id, isEditMode)
+                ModuleB.Http.WwwExampleCom.UsersDeepLink(id, isEditMode)
             }
             findNavController().navigate(deepLink.toNavDeepLinkRequest())
         }

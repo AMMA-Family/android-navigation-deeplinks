@@ -4,13 +4,13 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/included_graph"
+    android:id="@+id/second_graph"
     app:startDestination="@id/secondFragment">
 
     <fragment
         android:id="@+id/secondFragment"
         android:name="family.amma.module_b.SecondFragment"
-        android:label="FooBazz"
+        android:label="SecondFragment"
         tools:layout="@layout/fragment_second">
 
         <argument
@@ -22,15 +22,9 @@
             app:argType="integer"
             android:defaultValue="10" />
 
-        <argument
-            android:name="data"
-            app:argType="string"
-            android:defaultValue="fooBar"
-            app:nullable="true" />
-
         <deepLink
-            android:id="@+id/fooBar"
-            app:uri="http://www.example.com/users/{id}?isEditMode={isEditMode}&amp;data={data}" />
+            android:id="@+id/barFoo"
+            app:uri="http://www.example.com/users/{id}?isEditMode={isEditMode}" />
 
     </fragment>
 </navigation>
