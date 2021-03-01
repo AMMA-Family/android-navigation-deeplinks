@@ -2,13 +2,22 @@ package family.amma.deep_link.generator.ext
 
 import java.util.Locale
 
-/** Convert name from snack case (foo_bar_zoo) to camel case (FooBarZoo). */
-internal fun String.toCamelCase(locale: Locale = Locale.getDefault()): String {
-    val split: List<String> = this.split("_")
-    return when (split.size) {
-        0 -> ""
-        1 -> split[0].capitalize(locale)
-        else -> split.joinToCamelCase(locale)
-    }
-}
+private val camelRegex = "(?<=[a-zA-Z])[A-Z]".toRegex()
+private val snakeRegex = "_[a-zA-Z]".toRegex()
 
+private fun String.camelToSnakeCase(locale: Locale): String =
+    camelRegex.replace(this) { "_${it.value}" }.toLowerCase(locale)
+
+/** Convert name from snack case (foo_bar_zoo) to camel case (fooBarZoo). */
+private fun String.snakeToLowerCamelCase(locale: Locale): String =
+    snakeRegex.replace(this) {
+        it.value.replace("_", "").toUpperCase(locale)
+    }
+
+/** Convert name from snack case (foo_bar_zoo) to camel case (FooBarZoo). */
+private fun String.snakeToUpperCamelCase(locale: Locale = Locale.getDefault()): String =
+    snakeToLowerCamelCase(locale).capitalize(locale)
+
+/** Convert name from snack case (foo_bar_zoo) to camel case (FooBarZoo). */
+internal fun String.toCamelCase(locale: Locale = Locale.getDefault()): String =
+    snakeToUpperCamelCase(locale)

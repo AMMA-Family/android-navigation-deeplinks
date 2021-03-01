@@ -1,2 +1,3 @@
+/build
 /src/main/kotlin/*
 !src/main/kotlin/deep_link

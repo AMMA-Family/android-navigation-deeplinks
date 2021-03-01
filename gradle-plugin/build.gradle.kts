@@ -21,7 +21,7 @@ publishing {
         register("mavenPublish", MavenPublication::class.java) {
             groupId = "family.amma"
             artifactId = "deepLinks"
-            version = "0.1.0"
+            version = "0.1.1"
 
             from(components.getByName("java"))
         }

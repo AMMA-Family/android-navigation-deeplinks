@@ -116,11 +116,12 @@ private const val gradleKtsFileText = """
     }
     
     dependencies {
-        implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.30")
+        implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.31")
     }
 """
 
 private const val gitIgnoreFileText = """
+    /build
     /src/main/kotlin/*
     !src/main/kotlin/deep_link
 """

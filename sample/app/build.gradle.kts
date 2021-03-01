@@ -42,8 +42,8 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 }
 
 dependencies {
-    implementation(project(":sample:module-a"))
-    implementation(project(":sample:module-b"))
+    implementation(project(":module-a"))
+    implementation(project(":module-b"))
 
     val kotlinVersion: String by rootProject.extra
     implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
