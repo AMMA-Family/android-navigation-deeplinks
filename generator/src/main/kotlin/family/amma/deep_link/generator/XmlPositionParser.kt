@@ -3,6 +3,7 @@ package family.amma.deep_link.generator
 import family.amma.deep_link.generator.ext.attrValue
 import family.amma.deep_link.generator.ext.traverseStartTags
 import family.amma.deep_link.generator.entity.XmlPosition
+import family.amma.deep_link.generator.ext.io
 import family.amma.deep_link.generator.ext.showError
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
@@ -23,7 +24,7 @@ internal class XmlPositionParser(private val fileName: String, reader: Reader) {
     fun tag(): String = parser.name ?: ""
 
     /** @see XmlPullParser.traverseStartTags */
-    inline fun traverseStartTags(stopTraverse: () -> Boolean = { true }) {
+    suspend fun traverseStartTags(stopTraverse: suspend () -> Boolean = { true }) {
         parser.traverseStartTags(stopTraverse = stopTraverse, cacheData = ::cacheData)
     }
 
@@ -42,7 +43,8 @@ internal class XmlPositionParser(private val fileName: String, reader: Reader) {
      * Loops through the xml file until the next start tag at the same depth.
      * @param onStartTag Called when a start tag is encountered at inner depth.
      */
-    inline fun traverseInnerStartTags(onStartTag: () -> Unit = {}) {
+    @Suppress("BlockingMethodInNonBlockingContext")
+    suspend fun traverseInnerStartTags(onStartTag: suspend () -> Unit = {}) = io {
         val innerDepth = parser.depth + 1
         cacheData(lineNumber = parser.lineNumber, columnNumber = parser.columnNumber)
         parser.nextToken()
@@ -56,14 +58,14 @@ internal class XmlPositionParser(private val fileName: String, reader: Reader) {
     }
 
     /** @see XmlPullParser.attrValue */
-    fun attrValue(namespace: String, name: String): String? =
+    suspend fun attrValue(namespace: String, name: String): String? =
         parser.attrValue(namespace, name)
 
     /**
      * An error is logged if the specified attribute does not exist.
      * @see XmlPullParser.attrValue
      */
-    fun attrValueOrError(namespace: String, attrName: String): String =
+    suspend fun attrValueOrError(namespace: String, attrName: String): String =
         attrValue(namespace, attrName)
             ?: showError(message = mandatoryAttrMissingError(tag(), attrName), position = xmlPosition())
 }

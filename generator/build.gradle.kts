@@ -17,7 +17,7 @@ publishing {
         register("mavenPublish", MavenPublication::class.java) {
             groupId = "family.amma"
             artifactId = "generator"
-            version = "0.1.1"
+            version = "0.1.3"
 
             from(components.getByName("java"))
         }
@@ -34,6 +34,7 @@ dependencies {
     val kotlinVersion: String by rootProject.extra
 
     implementation(group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version = kotlinVersion)
+    implementation(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.4.2")
     implementation(group = "xmlpull", name = "xmlpull", version = "1.1.3.1")
     implementation(group = "com.squareup", name = "kotlinpoet", version = "1.7.2")
 }

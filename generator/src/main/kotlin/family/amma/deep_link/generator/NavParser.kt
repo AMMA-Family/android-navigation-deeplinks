@@ -39,7 +39,7 @@ internal class NavParser(
     private val applicationId: String
 ) {
     /** @return parsed [ParsedDestination] from xml. */
-    fun parseDestination(): ParsedDestination? {
+    suspend fun parseDestination(): ParsedDestination? {
         val position = parser.xmlPosition()
         val name = parser.attrValue(NAMESPACE_ANDROID, ATTRIBUTE_NAME)
         val idValue = parser.attrValue(NAMESPACE_ANDROID, ATTRIBUTE_ID)
@@ -74,7 +74,7 @@ internal class NavParser(
     }
 
     /** @return parsed [DestArgument] from xml or `null` if the argument is to be ignored. */
-    private fun parseArgument(): DestArgument {
+    private suspend fun parseArgument(): DestArgument {
         val xmlPosition = parser.xmlPosition()
         val name = parser.attrValueOrError(NAMESPACE_ANDROID, ATTRIBUTE_NAME)
         val defaultValue = parser.attrValue(NAMESPACE_ANDROID, ATTRIBUTE_DEFAULT_VALUE)
@@ -123,7 +123,7 @@ internal class NavParser(
     }
 
     /** @return parsed [DeepLink] from xml. */
-    private fun parseDeepLink(): DeepLink {
+    private suspend fun parseDeepLink(): DeepLink {
         val idValue = parser.attrValue(NAMESPACE_ANDROID, ATTRIBUTE_ID)
         val uriValue = parser.attrValueOrError(NAMESPACE_RES_AUTO, ATTRIBUTE_URI)
         val position = parser.xmlPosition()

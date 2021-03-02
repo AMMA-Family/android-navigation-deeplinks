@@ -3,6 +3,7 @@ package family.amma.deep_link.gradle_plugin
 import family.amma.deep_link.generator.GeneratorParams
 import family.amma.deep_link.generator.ext.filterUnique
 import family.amma.deep_link.generator.generateDeepLinks
+import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.Input
@@ -71,7 +72,7 @@ open class GenerateDeepLinksTask : DefaultTask() {
         generateDeepLinks(navFiles)
     }
 
-    private fun generateDeepLinks(navFiles: Collection<File>) {
+    private fun generateDeepLinks(navFiles: Collection<File>) = runBlocking {
         generateDeepLinks(rFilePackage, applicationId, navFiles.toList(), buildDir, generatorParams)
     }
 

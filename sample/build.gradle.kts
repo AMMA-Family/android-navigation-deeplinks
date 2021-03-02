@@ -13,7 +13,7 @@ buildscript {
         classpath("com.android.tools.build:gradle:$buildGradleVersion")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:$navVersion")
-        classpath("family.amma:deepLinks:0.1.2")
+        classpath("family.amma:deepLinks:0.1.4")
     }
 }
 
