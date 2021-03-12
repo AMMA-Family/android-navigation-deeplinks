@@ -3,6 +3,7 @@ package family.amma.deep_link.gradle_plugin
 import family.amma.deep_link.generator.GeneratorParams
 import family.amma.deep_link.generator.ext.filterUnique
 import family.amma.deep_link.generator.generateDeepLinks
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -72,7 +73,7 @@ open class GenerateDeepLinksTask : DefaultTask() {
         generateDeepLinks(navFiles)
     }
 
-    private fun generateDeepLinks(navFiles: Collection<File>) = runBlocking {
+    private fun generateDeepLinks(navFiles: Collection<File>) = runBlocking(Dispatchers.IO) {
         generateDeepLinks(rFilePackage, applicationId, navFiles.toList(), buildDir, generatorParams)
     }
 
@@ -120,7 +121,7 @@ private const val gradleKtsFileText = """
     }
     
     dependencies {
-        implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.31")
+        implementation(kotlin("stdlib"))
     }
 """
 

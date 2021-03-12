@@ -1,26 +1,22 @@
 buildscript {
-    val kotlinVersion: String by extra("1.4.31")
-    val buildGradleVersion: String by extra("4.1.2")
-    val navVersion: String by extra("2.3.0")
-
     repositories {
         google()
-        jcenter()
+        maven("https://plugins.gradle.org/m2/")
         mavenLocal()
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:$buildGradleVersion")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
-        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:$navVersion")
-        classpath("family.amma:deepLinks:0.1.4")
+        classpath(BuildPlugin.gradle)
+        classpath(BuildPlugin.kotlin)
+        classpath(BuildPlugin.safeArgs)
+        classpath("family.amma:deepLinks:0.1.5")
     }
 }
 
 allprojects {
     repositories {
         google()
-        jcenter()
+        maven("https://plugins.gradle.org/m2/")
         mavenLocal()
     }
 }

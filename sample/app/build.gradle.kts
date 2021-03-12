@@ -6,13 +6,13 @@ plugins {
 }
 
 android {
-    compileSdkVersion(30)
-    buildToolsVersion("30.0.3")
+    compileSdkVersion(AndroidProject.compileSdkVersion)
+    buildToolsVersion(AndroidProject.buildToolsVersion)
 
     defaultConfig {
         applicationId = "family.amma.deeplinks"
-        minSdkVersion(19)
-        targetSdkVersion(30)
+        minSdkVersion(AndroidProject.minSdkVersion)
+        targetSdkVersion(AndroidProject.targetSdkVersion)
     }
 
     buildTypes {
@@ -36,7 +36,7 @@ android {
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = AndroidProject.jvmTarget
     }
 }
 
@@ -44,13 +44,12 @@ dependencies {
     implementation(project(":module-a"))
     implementation(project(":module-b"))
 
-    val kotlinVersion: String by rootProject.extra
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
-    implementation("androidx.core:core-ktx:1.3.2")
-    implementation("androidx.appcompat:appcompat:1.2.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.0.4")
+    implementation(kotlin("stdlib"))
 
-    val navVersion: String by rootProject.extra
-    implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
-    implementation("androidx.navigation:navigation-ui-ktx:$navVersion")
+    implementation(Dependency.AndroidX.coreKtx)
+    implementation(Dependency.AndroidX.appcompat)
+    implementation(Dependency.AndroidX.constraintlayout)
+
+    implementation(Dependency.AndroidX.Navigation.fragment)
+    implementation(Dependency.AndroidX.Navigation.ui)
 }

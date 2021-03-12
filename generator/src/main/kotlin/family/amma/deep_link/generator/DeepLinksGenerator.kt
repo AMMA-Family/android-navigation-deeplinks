@@ -10,8 +10,8 @@ import family.amma.deep_link.generator.ext.replace
 import family.amma.deep_link.generator.fileSpec.common.generatedDeepLinkFileSpec
 import family.amma.deep_link.generator.fileSpec.deepLinksFileSpecByDestinations
 import family.amma.deep_link.generator.fileSpec.deepLinksFileSpecHierarchy
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileReader
 import java.io.Serializable
@@ -37,13 +37,15 @@ suspend fun generateDeepLinks(
     outputDir: File,
     params: GeneratorParams
 ) = io {
-    navigationXmlFiles
-        .mapNotNull { parseNavigationFile(rFilePackage, applicationId, it) }
-        .map { parsedDestination -> async { parsedDestination.toFileSpecList(applicationId, params) } }
-        .awaitAll()
-        .flatten()
-        .plus(generatedDeepLinkFileSpec())
-        .forEach { outputDir.write(it) }
+    val jobs = navigationXmlFiles.map { navFile ->
+        launch {
+            parseNavigationFile(rFilePackage, applicationId, navFile)
+                ?.toFileSpecList(applicationId, params)
+                ?.forEach { outputDir.write(it) }
+        }
+    }
+    outputDir.write(generatedDeepLinkFileSpec())
+    jobs.joinAll()
 }
 
 @Suppress("BlockingMethodInNonBlockingContext")
