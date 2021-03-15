@@ -10,6 +10,7 @@ import family.amma.deep_link.generator.entity.DestArgument
 import family.amma.deep_link.generator.entity.NavParserErrors
 import family.amma.deep_link.generator.entity.ParsedDestination
 import family.amma.deep_link.generator.entity.XmlPosition
+import kotlinx.coroutines.CoroutineDispatcher
 
 private const val TAG_NAVIGATION = "navigation"
 private const val TAG_DEEP_LINK = "deepLink"
@@ -39,18 +40,18 @@ internal class NavParser(
     private val applicationId: String
 ) {
     /** @return parsed [ParsedDestination] from xml. */
-    suspend fun parseDestination(): ParsedDestination? {
+    suspend fun parseDestination(dispatcher: CoroutineDispatcher): ParsedDestination? {
         val position = parser.xmlPosition()
-        val name = parser.attrValue(NAMESPACE_ANDROID, ATTRIBUTE_NAME)
-        val idValue = parser.attrValue(NAMESPACE_ANDROID, ATTRIBUTE_ID)
+        val name = parser.attrValue(NAMESPACE_ANDROID, ATTRIBUTE_NAME, dispatcher)
+        val idValue = parser.attrValue(NAMESPACE_ANDROID, ATTRIBUTE_ID, dispatcher)
         val deepLinks = mutableListOf<DeepLink>()
         val args = mutableListOf<DestArgument>()
         val nested = mutableListOf<ParsedDestination>()
-        parser.traverseInnerStartTags {
+        parser.traverseInnerStartTags(dispatcher) {
             when (parser.tag()) {
-                TAG_DEEP_LINK -> deepLinks.add(parseDeepLink())
-                TAG_ARGUMENT -> args.add(parseArgument())
-                TAG_NAVIGATION, TAG_FRAGMENT -> parseDestination()?.let(nested::add)
+                TAG_DEEP_LINK -> deepLinks.add(parseDeepLink(dispatcher))
+                TAG_ARGUMENT -> args.add(parseArgument(dispatcher))
+                TAG_NAVIGATION, TAG_FRAGMENT -> parseDestination(dispatcher)?.let(nested::add)
             }
         }
 
@@ -74,14 +75,14 @@ internal class NavParser(
     }
 
     /** @return parsed [DestArgument] from xml or `null` if the argument is to be ignored. */
-    private suspend fun parseArgument(): DestArgument {
+    private suspend fun parseArgument(dispatcher: CoroutineDispatcher): DestArgument {
         val xmlPosition = parser.xmlPosition()
-        val name = parser.attrValueOrError(NAMESPACE_ANDROID, ATTRIBUTE_NAME)
-        val defaultValue = parser.attrValue(NAMESPACE_ANDROID, ATTRIBUTE_DEFAULT_VALUE)
-        val typeString = parser.attrValue(NAMESPACE_RES_AUTO, ATTRIBUTE_TYPE)
-        val nullable = parser.attrValue(NAMESPACE_RES_AUTO, ATTRIBUTE_NULLABLE)?.let { it == VALUE_TRUE } ?: false
+        val name = parser.attrValueOrError(NAMESPACE_ANDROID, ATTRIBUTE_NAME, dispatcher)
+        val defaultValue = parser.attrValue(NAMESPACE_ANDROID, ATTRIBUTE_DEFAULT_VALUE, dispatcher)
+        val typeString = parser.attrValue(NAMESPACE_RES_AUTO, ATTRIBUTE_TYPE, dispatcher)
+        val nullable = parser.attrValue(NAMESPACE_RES_AUTO, ATTRIBUTE_NULLABLE, dispatcher)?.let { it == VALUE_TRUE } ?: false
 
-        if (parser.attrValue(NAMESPACE_RES_AUTO, ATTRIBUTE_TYPE_DEPRECATED) != null) {
+        if (parser.attrValue(NAMESPACE_RES_AUTO, ATTRIBUTE_TYPE_DEPRECATED, dispatcher) != null) {
             showError(NavParserErrors.deprecatedTypeAttrUsed(name), xmlPosition)
         }
 
@@ -123,11 +124,11 @@ internal class NavParser(
     }
 
     /** @return parsed [DeepLink] from xml. */
-    private suspend fun parseDeepLink(): DeepLink {
-        val idValue = parser.attrValue(NAMESPACE_ANDROID, ATTRIBUTE_ID)
-        val uriValue = parser.attrValueOrError(NAMESPACE_RES_AUTO, ATTRIBUTE_URI)
+    private suspend fun parseDeepLink(dispatcher: CoroutineDispatcher): DeepLink {
+        val idValue = parser.attrValue(NAMESPACE_ANDROID, ATTRIBUTE_ID, dispatcher)
+        val uriValue = parser.attrValueOrError(NAMESPACE_RES_AUTO, ATTRIBUTE_URI, dispatcher)
         val position = parser.xmlPosition()
-        parser.traverseInnerStartTags()
+        parser.traverseInnerStartTags(dispatcher)
 
         val id = if (idValue != null) {
             parseId(idValue, rFilePackage, position)

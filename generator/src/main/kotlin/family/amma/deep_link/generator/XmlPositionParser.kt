@@ -1,10 +1,9 @@
 package family.amma.deep_link.generator
 
-import family.amma.deep_link.generator.ext.attrValue
-import family.amma.deep_link.generator.ext.traverseStartTags
 import family.amma.deep_link.generator.entity.XmlPosition
-import family.amma.deep_link.generator.ext.io
 import family.amma.deep_link.generator.ext.showError
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 import java.io.Reader
@@ -23,9 +22,27 @@ internal class XmlPositionParser(private val fileName: String, reader: Reader) {
     /** @return [XmlPullParser.getName] or empty. */
     fun tag(): String = parser.name ?: ""
 
-    /** @see XmlPullParser.traverseStartTags */
-    suspend fun traverseStartTags(stopTraverse: suspend () -> Boolean = { true }) {
-        parser.traverseStartTags(stopTraverse = stopTraverse, cacheData = ::cacheData)
+    /**
+     * Loops through the xml file until the next start tag.
+     * @param stopTraverse Called when a start tag is encountered. If true, the loop will be stopped.
+     */
+    suspend fun traverseStartTags(dispatcher: CoroutineDispatcher, stopTraverse: suspend () -> Boolean = { true }) = with(parser) {
+        withContext(dispatcher) {
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+                val processedLine = lineNumber
+                val processedColumn = columnNumber
+                if (eventType == XmlPullParser.START_TAG) {
+                    if (stopTraverse()) return@withContext
+                }
+
+                // otherwise onStart already called next() and we need to try to process current node
+                if (processedLine == lineNumber && processedColumn == columnNumber) {
+                    cacheData(processedLine, processedColumn)
+                    @Suppress("BlockingMethodInNonBlockingContext")
+                    nextToken()
+                }
+            }
+        }
     }
 
     private var startLine = 0
@@ -43,12 +60,12 @@ internal class XmlPositionParser(private val fileName: String, reader: Reader) {
      * Loops through the xml file until the next start tag at the same depth.
      * @param onStartTag Called when a start tag is encountered at inner depth.
      */
-    @Suppress("BlockingMethodInNonBlockingContext")
-    suspend fun traverseInnerStartTags(onStartTag: suspend () -> Unit = {}) = io {
+    suspend fun traverseInnerStartTags(dispatcher: CoroutineDispatcher, onStartTag: suspend () -> Unit = {}) = withContext(dispatcher) {
         val innerDepth = parser.depth + 1
         cacheData(lineNumber = parser.lineNumber, columnNumber = parser.columnNumber)
+        @Suppress("BlockingMethodInNonBlockingContext")
         parser.nextToken()
-        traverseStartTags(stopTraverse = {
+        traverseStartTags(dispatcher, stopTraverse = {
             val currentDepth = parser.depth
             if (innerDepth == currentDepth) {
                 onStartTag()
@@ -57,16 +74,21 @@ internal class XmlPositionParser(private val fileName: String, reader: Reader) {
         })
     }
 
-    /** @see XmlPullParser.attrValue */
-    suspend fun attrValue(namespace: String, name: String): String? =
-        parser.attrValue(namespace, name)
+    /** @return the value of the attribute with the specified namespace and name, if it exists, or null. */
+    suspend fun attrValue(namespace: String, name: String, dispatcher: CoroutineDispatcher): String? = with(parser) {
+        withContext(dispatcher) {
+            (0 until attributeCount)
+                .find { namespace == getAttributeNamespace(it) && name == getAttributeName(it) }
+                ?.let(::getAttributeValue)
+        }
+    }
 
     /**
      * An error is logged if the specified attribute does not exist.
-     * @see XmlPullParser.attrValue
+     * @see attrValue
      */
-    suspend fun attrValueOrError(namespace: String, attrName: String): String =
-        attrValue(namespace, attrName)
+    suspend fun attrValueOrError(namespace: String, attrName: String, dispatcher: CoroutineDispatcher): String =
+        attrValue(namespace, attrName, dispatcher)
             ?: showError(message = mandatoryAttrMissingError(tag(), attrName), position = xmlPosition())
 }
 

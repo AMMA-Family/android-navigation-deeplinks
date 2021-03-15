@@ -5,13 +5,14 @@ import family.amma.deep_link.generator.entity.DestinationModel
 import family.amma.deep_link.generator.entity.ParsedDestination
 import family.amma.deep_link.generator.entity.plus
 import family.amma.deep_link.generator.entity.toDestinationModel
-import family.amma.deep_link.generator.ext.io
 import family.amma.deep_link.generator.ext.replace
 import family.amma.deep_link.generator.fileSpec.common.generatedDeepLinkFileSpec
 import family.amma.deep_link.generator.fileSpec.deepLinksFileSpecByDestinations
 import family.amma.deep_link.generator.fileSpec.deepLinksFileSpecHierarchy
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileReader
 import java.io.Serializable
@@ -35,21 +36,22 @@ suspend fun generateDeepLinks(
     applicationId: String,
     navigationXmlFiles: List<File>,
     outputDir: File,
-    params: GeneratorParams
-) = io {
+    params: GeneratorParams,
+    dispatcher: CoroutineDispatcher
+) = withContext(dispatcher) {
     val jobs = navigationXmlFiles.map { navFile ->
-        launch {
-            parseNavigationFile(rFilePackage, applicationId, navFile)
+        launch(dispatcher) {
+            parseNavigationFile(rFilePackage, applicationId, navFile, dispatcher)
                 ?.toFileSpecList(applicationId, params)
-                ?.forEach { outputDir.write(it) }
+                ?.forEach { outputDir.write(it, dispatcher) }
         }
     }
-    outputDir.write(generatedDeepLinkFileSpec())
+    outputDir.write(generatedDeepLinkFileSpec(), dispatcher)
     jobs.joinAll()
 }
 
 @Suppress("BlockingMethodInNonBlockingContext")
-private suspend fun File.write(fileSpec: FileSpec) = io {
+private suspend fun File.write(fileSpec: FileSpec, dispatcher: CoroutineDispatcher) = withContext(dispatcher) {
     fileSpec.writeTo(this@write)
 }
 
@@ -58,13 +60,14 @@ private suspend fun File.write(fileSpec: FileSpec) = io {
 private suspend fun parseNavigationFile(
     rFilePackage: String,
     applicationId: String,
-    navigationXml: File
-): ParsedDestination? = io {
+    navigationXml: File,
+    dispatcher: CoroutineDispatcher
+): ParsedDestination? = withContext(dispatcher) {
     FileReader(navigationXml).use { reader ->
         val parser = XmlPositionParser(navigationXml.path, reader)
-        parser.traverseStartTags()
+        parser.traverseStartTags(dispatcher)
         val navParser = NavParser(parser, rFilePackage, applicationId)
-        navParser.parseDestination()
+        navParser.parseDestination(dispatcher)
     }
 }
 

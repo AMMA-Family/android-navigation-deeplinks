@@ -55,12 +55,18 @@ open class GenerateDeepLinksTask : DefaultTask() {
     }
 
     private fun doIncrementalTaskAction(changedInputs: Map<File, ChangeType>) {
-        val removedFiles = changedInputs.filter { (_, status) -> status == ChangeType.REMOVED }.keys
-        generateDeepLinks(navFiles = changedInputs.minus(removedFiles).keys)
-        removedFiles.forEach { it.delete() }
+        /*
+        This option is one of the most optimal in terms of performance.
+        It is definitely not worth using the option that involves the use of `.keys`.
+        Going through the map is two times cheaper than creating new sets.
+        */
+        generateDeepLinks(navFiles = changedInputs.mapNotNull { (file, status) -> if (status != ChangeType.REMOVED) file else null })
+        changedInputs
+            .mapNotNull { (file, status) -> if (status == ChangeType.REMOVED) file else null }
+            .forEach(File::delete)
     }
 
-    private fun doFullTaskAction(navFiles: Collection<File>) {
+    private fun doFullTaskAction(navFiles: List<File>) {
         if (buildDir.exists() && !buildDir.deleteRecursively()) {
             project.logger.warn("Failed to clear build directory for deep links")
         }
@@ -73,8 +79,11 @@ open class GenerateDeepLinksTask : DefaultTask() {
         generateDeepLinks(navFiles)
     }
 
-    private fun generateDeepLinks(navFiles: Collection<File>) = runBlocking(Dispatchers.IO) {
-        generateDeepLinks(rFilePackage, applicationId, navFiles.toList(), buildDir, generatorParams)
+    private fun generateDeepLinks(navFiles: List<File>) {
+        val dispatcher = Dispatchers.IO
+        runBlocking(dispatcher) {
+            generateDeepLinks(rFilePackage, applicationId, navFiles, buildDir, generatorParams, dispatcher)
+        }
     }
 
     private fun copyToMainModule() {

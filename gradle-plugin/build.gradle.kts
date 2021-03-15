@@ -21,7 +21,7 @@ publishing {
         register("mavenPublish", MavenPublication::class.java) {
             groupId = "family.amma"
             artifactId = "deepLinks"
-            version = "0.1.6"
+            version = "0.1.7"
 
             from(components.getByName("java"))
         }
@@ -42,7 +42,7 @@ dependencies {
     implementation(Dependency.Kotlin.X.Serialization.core)
     implementation(Dependency.Kotlin.X.Coroutines.core)
 
-    implementation("family.amma:generator:0.1.4")
+    implementation("family.amma:generator:0.1.5")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile> {

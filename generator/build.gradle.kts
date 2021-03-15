@@ -17,7 +17,7 @@ publishing {
         register("mavenPublish", MavenPublication::class.java) {
             groupId = "family.amma"
             artifactId = "generator"
-            version = "0.1.4"
+            version = "0.1.5"
 
             from(components.getByName("java"))
         }
