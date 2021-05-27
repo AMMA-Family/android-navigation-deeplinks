@@ -2,6 +2,7 @@ import groovy.lang.MissingPropertyException
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.publish.maven.MavenPom
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.get
@@ -13,10 +14,44 @@ import java.util.Properties
 fun Project.requireProperty(name: String): String =
     findProperty(name)?.toString() ?: throw MissingPropertyException("Not found property with name: $name")
 
+fun Project.localProperties(): Properties {
+    val local = Properties()
+    val localProperties: File = rootProject.file("local.properties")
+    if (localProperties.exists()) {
+        localProperties.inputStream().use { local.load(it) }
+    }
+    return local
+}
+
 sealed class PublicationType {
     object Android : PublicationType()
     object Mpp : PublicationType()
     data class JavaLib(val java: JavaPluginExtension) : PublicationType()
+}
+
+fun MavenPom.config(project: Project) {
+    name.set(project.requireProperty(name = "publication.groupId"))
+    description.set(project.requireProperty("publication.description"))
+    url.set(project.requireProperty("publication.url"))
+    licenses {
+        license {
+            name.set(project.requireProperty("publication.license.name"))
+            url.set(project.requireProperty("publication.license.url"))
+        }
+    }
+    developers {
+        developer {
+            name.set(project.requireProperty("publication.developer.name"))
+            email.set(project.requireProperty("publication.developer.email"))
+            organization.set(project.requireProperty("publication.developer.email"))
+            organizationUrl.set(project.requireProperty("publication.developer.email"))
+        }
+    }
+    scm {
+        connection.set(project.requireProperty("publication.scm.connection"))
+        developerConnection.set(project.requireProperty("publication.scm.developerConnection"))
+        url.set(project.requireProperty("publication.scm.url"))
+    }
 }
 
 fun Project.publish(
@@ -54,53 +89,26 @@ fun Project.publish(
         }
     }
 
-    fun MavenPublication.setIds() {
+    fun MavenPublication.metadata() {
         this.groupId = groupId
         this.artifactId = artifactId
         this.version = versionName
     }
 
-    fun MavenPublication.setPom() {
-        pom {
-            name.set(groupId)
-            description.set(project.requireProperty("publication.description"))
-            url.set(project.requireProperty("publication.url"))
-            licenses {
-                license {
-                    name.set(project.requireProperty("publication.license.name"))
-                    url.set(project.requireProperty("publication.license.url"))
-                }
-            }
-            developers {
-                developer {
-                    name.set(project.requireProperty("publication.developer.name"))
-                    email.set(project.requireProperty("publication.developer.email"))
-                    organization.set(project.requireProperty("publication.developer.email"))
-                    organizationUrl.set(project.requireProperty("publication.developer.email"))
-                }
-            }
-            scm {
-                connection.set(project.requireProperty("publication.scm.connection"))
-                developerConnection.set(project.requireProperty("publication.scm.developerConnection"))
-                url.set(project.requireProperty("publication.scm.url"))
-            }
-        }
-    }
-
     when (publicationType) {
         PublicationType.Mpp -> {
             publishing.publications.withType<MavenPublication>().configureEach {
-                setIds()
-                setPom()
+                metadata()
+                pom { config(project) }
             }
             signing.sign(publishing.publications)
         }
 
         PublicationType.Android -> {
             publishing.publications.register("mavenAndroid", MavenPublication::class.java) {
-                setIds()
+                metadata()
                 from(project.components.getByName("release"))
-                setPom()
+                pom { config(project) }
             }
             signing.sign(publishing.publications["mavenAndroid"])
         }
@@ -112,20 +120,11 @@ fun Project.publish(
                 withSourcesJar()
             }
             publishing.publications.create("mavenJava", MavenPublication::class.java) {
-                setIds()
+                metadata()
                 from(project.components.getByName("java"))
-                setPom()
+                pom { config(project) }
             }
             signing.sign(publishing.publications["mavenJava"])
         }
     }
-}
-
-fun Project.localProperties(): Properties {
-    val local = Properties()
-    val localProperties: File = rootProject.file("local.properties")
-    if (localProperties.exists()) {
-        localProperties.inputStream().use { local.load(it) }
-    }
-    return local
 }

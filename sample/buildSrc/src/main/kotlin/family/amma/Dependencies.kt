@@ -1,6 +1,6 @@
 @file:JvmMultifileClass
 
-private const val kotlinVersion = "1.5.0"
+private const val kotlinVersion = "1.5.10"
 private const val navigationVersion = "2.3.5"
 
 object BuildPlugin {
