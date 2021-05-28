@@ -8,7 +8,7 @@ import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import family.amma.deep_link.generator.STRING_FORMAT
+import family.amma.deep_link.generator.parser.STRING_FORMAT
 
 /**
  * Example:

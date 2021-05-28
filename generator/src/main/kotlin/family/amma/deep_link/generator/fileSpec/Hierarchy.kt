@@ -4,7 +4,6 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.TypeSpec
-import family.amma.deep_link.generator.GeneratorParams
 import family.amma.deep_link.generator.entity.DeepLink
 import family.amma.deep_link.generator.entity.DestinationModel
 import family.amma.deep_link.generator.entity.Uri
@@ -13,6 +12,7 @@ import family.amma.deep_link.generator.ext.toCamelCase
 import family.amma.deep_link.generator.fileSpec.common.camelCaseName
 import family.amma.deep_link.generator.fileSpec.common.deepLinkTypeSpec
 import family.amma.deep_link.generator.fileSpec.common.indent
+import family.amma.deep_link.generator.main.GeneratorParams
 
 /** File for the hierarchical structure of deep links. */
 internal fun deepLinksFileSpecHierarchy(

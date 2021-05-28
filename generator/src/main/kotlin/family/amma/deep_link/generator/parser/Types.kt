@@ -1,8 +1,9 @@
-package family.amma.deep_link.generator
+package family.amma.deep_link.generator.parser
 
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.TypeName
 import com.squareup.kotlinpoet.asTypeName
+import family.amma.deep_link.generator.entity.ResReference
 
 const val STRING_FORMAT = "%S"
 

@@ -4,8 +4,8 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
-import family.amma.deep_link.generator.GeneratorParams
-import family.amma.deep_link.generator.STRING_FORMAT
+import family.amma.deep_link.generator.main.GeneratorParams
+import family.amma.deep_link.generator.parser.STRING_FORMAT
 import family.amma.deep_link.generator.entity.*
 import family.amma.deep_link.generator.ext.addConstructorWithProps
 import family.amma.deep_link.generator.ext.constValProp

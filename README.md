@@ -8,7 +8,7 @@ This library goes through your navigation files, pulls out information about dee
 buildscript {
     dependencies {
         ...
-        classpath("family.amma:deeplinks-gradle-plugin:1.0.1")
+        classpath("family.amma:deeplinks-gradle-plugin:1.0.2")
         // not necessary, but handy for working with taking arguments
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:2.3.5")
     }

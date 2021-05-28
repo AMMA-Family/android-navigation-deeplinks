@@ -1,4 +1,4 @@
-package family.amma.deep_link.generator
+package family.amma.deep_link.generator.entity
 
 /**
  * Example: `package.R.id.resource_name`, where `package` is [packageName], `id` is [resType], `resource_name` is [name].
