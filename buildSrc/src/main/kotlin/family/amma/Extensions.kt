@@ -1,8 +1,13 @@
 import groovy.lang.MissingPropertyException
 import org.gradle.api.Project
+import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.publish.maven.MavenPom
 import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.kotlin.dsl.maven
+import org.gradle.kotlin.dsl.extra
+import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.withType
+import org.gradle.plugins.signing.SigningExtension
 import java.io.File
 import java.util.Properties
 
@@ -18,67 +23,108 @@ fun Project.localProperties(): Properties {
     return local
 }
 
-enum class PublicationType {
-    Android,
-    Mpp,
-    JavaLib
+sealed class PublicationType {
+    object Android : PublicationType()
+    object Mpp : PublicationType()
+    data class JavaLib(val java: JavaPluginExtension) : PublicationType()
 }
 
-fun PublishingExtension.configure(
-    project: Project,
-    groupId: String,
-    versionName: String,
+fun MavenPom.config(project: Project) {
+    name.set(project.requireProperty(name = "publication.groupId"))
+    description.set(project.requireProperty("publication.description"))
+    url.set(project.requireProperty("publication.url"))
+    licenses {
+        license {
+            name.set(project.requireProperty("publication.license.name"))
+            url.set(project.requireProperty("publication.license.url"))
+        }
+    }
+    developers {
+        developer {
+            name.set(project.requireProperty("publication.developer.name"))
+            email.set(project.requireProperty("publication.developer.email"))
+            organization.set(project.requireProperty("publication.developer.email"))
+            organizationUrl.set(project.requireProperty("publication.developer.email"))
+        }
+    }
+    scm {
+        connection.set(project.requireProperty("publication.scm.connection"))
+        developerConnection.set(project.requireProperty("publication.scm.developerConnection"))
+        url.set(project.requireProperty("publication.scm.url"))
+    }
+}
+
+fun Project.publish(
+    publishing: PublishingExtension,
+    signing: SigningExtension,
     artifactId: String,
     publicationType: PublicationType
 ) {
-    repositories {
-        maven(url = project.requireProperty("publication.repository.url")) {
-            name = project.requireProperty(name = "publication.repository.name")
+    val groupId: String = project.requireProperty(name = "publication.groupId")
+    val versionName: String = project.requireProperty(name = "publication.versionName")
+
+    group = groupId
+    version = versionName
+
+    val localProperties = project.localProperties()
+
+    extra["signing.keyId"] = localProperties.getProperty("publication.signing.keyId")
+    extra["signing.password"] = localProperties.getProperty("publication.signing.password")
+    extra["signing.secretKeyRingFile"] = "$rootDir/${localProperties.getProperty("publication.signing.secretKeyRingFileName")}"
+
+    publishing.repositories {
+        maven {
+            name = "mavenCentral"
+            setUrl(
+                if (project.version.let { it as String }.endsWith("-SNAPSHOT"))
+                    "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+                else
+                    "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            )
+
             credentials {
-                val localProperties = project.localProperties()
                 username = localProperties.getProperty("publication.user.login")
                 password = localProperties.getProperty("publication.user.password")
             }
         }
     }
 
-    fun MavenPublication.configure() {
+    fun MavenPublication.metadata() {
         this.groupId = groupId
         this.artifactId = artifactId
         this.version = versionName
-
-        pom {
-            name.set(groupId)
-            licenses {
-                license {
-                    name.set("The Apache Software License, Version 2.0")
-                    url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                    distribution.set("repo")
-                }
-            }
-        }
     }
 
     when (publicationType) {
         PublicationType.Mpp -> {
-            //TODO in kotlin 1.4.10 this line causes problems, the dependency does not sync.
-            //publications.withType<MavenPublication>().configureEach(MavenPublication::configure)
+            publishing.publications.withType<MavenPublication>().configureEach {
+                metadata()
+                pom { config(project) }
+            }
+            signing.sign(publishing.publications)
         }
 
-        PublicationType.Android ->
-            publications {
-                register("mavenPublish", MavenPublication::class.java) {
-                    configure()
-                    from(project.components.getByName("release"))
-                }
+        PublicationType.Android -> {
+            publishing.publications.register("mavenAndroid", MavenPublication::class.java) {
+                metadata()
+                from(project.components.getByName("release"))
+                pom { config(project) }
             }
+            signing.sign(publishing.publications["mavenAndroid"])
+        }
 
-        PublicationType.JavaLib ->
-            publications {
-                create("mavenPublish", MavenPublication::class.java) {
-                    configure()
-                    from(project.components.getByName("java"))
-                }
+        is PublicationType.JavaLib -> {
+            @Suppress("UnstableApiUsage")
+            with(publicationType.java) {
+                withJavadocJar()
+                withSourcesJar()
             }
+            publishing.publications.create("mavenJava", MavenPublication::class.java) {
+                metadata()
+                from(project.components.getByName("java"))
+                pom { config(project) }
+            }
+            signing.sign(publishing.publications["mavenJava"])
+        }
     }
 }

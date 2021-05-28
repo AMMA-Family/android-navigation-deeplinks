@@ -3,7 +3,7 @@
 plugins {
     id("com.android.library")
     kotlin("android")
-    id("family.amma.deepLinks")
+    id("family.amma.deeplinks")
     id("androidx.navigation.safeargs.kotlin")
 }
 

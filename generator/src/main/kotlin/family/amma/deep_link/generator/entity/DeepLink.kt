@@ -1,6 +1,5 @@
 package family.amma.deep_link.generator.entity
 
-import family.amma.deep_link.generator.ResReference
 import java.net.URI
 
 /**
@@ -21,7 +20,8 @@ internal typealias Uri = String
 
 internal fun Uri.header() = UriHeader(split("://"))
 
-internal inline class UriHeader(private val header: List<String>) {
+@JvmInline
+internal value class UriHeader(private val header: List<String>) {
     /** @return first part before '://' or `null`. */
     fun protocol(): String? =
         header.takeIf { it.size > 1 }?.first()

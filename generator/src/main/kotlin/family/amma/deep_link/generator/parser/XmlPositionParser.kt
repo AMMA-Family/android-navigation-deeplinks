@@ -1,4 +1,4 @@
-package family.amma.deep_link.generator
+package family.amma.deep_link.generator.parser
 
 import family.amma.deep_link.generator.entity.XmlPosition
 import family.amma.deep_link.generator.ext.showError

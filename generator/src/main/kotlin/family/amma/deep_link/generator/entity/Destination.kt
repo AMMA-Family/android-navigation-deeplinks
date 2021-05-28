@@ -1,6 +1,5 @@
 package family.amma.deep_link.generator.entity
 
-import family.amma.deep_link.generator.ResReference
 import com.squareup.kotlinpoet.ClassName
 import family.amma.deep_link.generator.ext.filterUnique
 

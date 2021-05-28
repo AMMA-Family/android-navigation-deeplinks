@@ -1,6 +1,6 @@
 package family.amma.deep_link.generator.entity
 
-import family.amma.deep_link.generator.NavType
+import family.amma.deep_link.generator.parser.NavType
 
 internal object NavParserErrors {
     const val UNKNOWN_DESTINATION = "Destination with must contain 'id' attribute."

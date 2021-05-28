@@ -1,4 +1,4 @@
-package family.amma.deep_link.generator
+package family.amma.deep_link.generator.main
 
 import com.squareup.kotlinpoet.FileSpec
 import family.amma.deep_link.generator.entity.DestinationModel
@@ -9,24 +9,14 @@ import family.amma.deep_link.generator.ext.replace
 import family.amma.deep_link.generator.fileSpec.common.generatedDeepLinkFileSpec
 import family.amma.deep_link.generator.fileSpec.deepLinksFileSpecByDestinations
 import family.amma.deep_link.generator.fileSpec.deepLinksFileSpecHierarchy
+import family.amma.deep_link.generator.parser.NavParser
+import family.amma.deep_link.generator.parser.XmlPositionParser
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileReader
-import java.io.Serializable
-
-/**
- * @param generateByDestinations Generation of a separate file with deep links for each destination.
- * @param generateUriHierarchy Generating a hierarchy of deep links based on their url.
- * @param generateAdditionalInfo Generation of additional information for all types of generation: names, protocol, host and path segments.
- */
-data class GeneratorParams(
-    val generateByDestinations: Boolean,
-    val generateUriHierarchy: Boolean,
-    val generateAdditionalInfo: Boolean
-) : Serializable
 
 /**
  * Not pure function that parses xml files, generates code, and writes it to .kt files.
@@ -39,20 +29,18 @@ suspend fun generateDeepLinks(
     params: GeneratorParams,
     dispatcher: CoroutineDispatcher
 ) = withContext(dispatcher) {
-    val jobs = navigationXmlFiles.map { navFile ->
-        launch(dispatcher) {
-            parseNavigationFile(rFilePackage, applicationId, navFile, dispatcher)
-                ?.toFileSpecList(applicationId, params)
-                ?.forEach { outputDir.write(it, dispatcher) }
-        }
+    if (params.isAsyncParsing) {
+        navigationXmlFiles
+            .map { navFile -> async(dispatcher) { parseNavigationFile(rFilePackage, applicationId, navFile, dispatcher) } }
+            .awaitAll()
+            .filterNotNull()
+    } else {
+        navigationXmlFiles
+            .mapNotNull { parseNavigationFile(rFilePackage, applicationId, it, dispatcher) }
     }
-    outputDir.write(generatedDeepLinkFileSpec(), dispatcher)
-    jobs.joinAll()
-}
-
-@Suppress("BlockingMethodInNonBlockingContext")
-private suspend fun File.write(fileSpec: FileSpec, dispatcher: CoroutineDispatcher) = withContext(dispatcher) {
-    fileSpec.writeTo(this@write)
+        .toFileSpecList(applicationId, params)
+        .plus(generatedDeepLinkFileSpec())
+        .forEach { fileSpec -> fileSpec.writeTo(outputDir) }
 }
 
 /** @return parsed [ParsedDestination] with nested destinations. */
@@ -72,8 +60,9 @@ private suspend fun parseNavigationFile(
 }
 
 /** @return file specifications for subsequent generation for [ParsedDestination]. */
-private fun ParsedDestination.toFileSpecList(applicationId: String, params: GeneratorParams): List<FileSpec> =
-    toDestinationList(this)
+private fun List<ParsedDestination>.toFileSpecList(applicationId: String, params: GeneratorParams): List<FileSpec> =
+    map(::toDestinationList)
+        .flatten()
         .filter { it.deepLinks.isNotEmpty() }
         .let(::merge)
         .let { destinations: List<DestinationModel> ->

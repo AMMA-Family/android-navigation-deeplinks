@@ -1,8 +1,8 @@
 package family.amma.deep_link.gradle_plugin
 
-import family.amma.deep_link.generator.GeneratorParams
 import family.amma.deep_link.generator.ext.filterUnique
-import family.amma.deep_link.generator.generateDeepLinks
+import family.amma.deep_link.generator.main.generateDeepLinks
+import family.amma.deep_link.generator.main.GeneratorParams
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask

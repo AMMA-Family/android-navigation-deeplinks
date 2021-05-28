@@ -13,8 +13,8 @@ buildscript {
 allprojects {
     repositories {
         google()
-        maven("https://plugins.gradle.org/m2/")
-        mavenLocal()
         mavenCentral()
+        maven("https://plugins.gradle.org/m2/")
+        maven("https://s01.oss.sonatype.org/content/groups/public/")
     }
 }
