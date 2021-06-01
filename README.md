@@ -3,7 +3,7 @@
 This library goes through your navigation files, pulls out information about deep links, generates code and puts it in a separate module `navigation_deep_links`.
 
 ## Introduction
-#### Add the library to your `build.gradle` file.
+#### Add the library to your `build.gradle.kts` file.
 ```kotlin
 buildscript {
     dependencies {
@@ -22,7 +22,7 @@ plugins {
     id("androidx.navigation.safeargs.kotlin")
 }
 ```
-#### After generating the module add it to `settings.gradle`:
+#### After generating the module add it to `settings.gradle.kts`:
 The module automatically generated after the build, but for manual launch `:generateDeepLinks`
 ```kotlin
 include(
@@ -30,7 +30,7 @@ include(
     ":navigation-deep-links"
 )
 ```
-#### To use the generated code: `build.gradle`
+#### To use the generated code: `build.gradle.kts`
 ```kotlin
 dependencies {
     implementation(project(":navigation-deep-links"))
