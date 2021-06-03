@@ -1,6 +1,5 @@
-# android-navigation-deeplinks
-## Concept
-This library goes through your navigation files, pulls out information about deep links, generates code and puts it in a separate module `navigation_deep_links`.
+# Android navigation deep links
+This library goes through your navigation files, it pulls out information about deep links, generates code and puts it in a separate module `navigation_deep_links`.
 
 ## Introduction
 #### Add the library to your `build.gradle.kts` file.
@@ -22,7 +21,7 @@ plugins {
     id("androidx.navigation.safeargs.kotlin")
 }
 ```
-#### After generating the module add it to `settings.gradle.kts`:
+#### After generating the module add it to the `settings.gradle.kts`:
 The module automatically generated after the build, but for manual launch `:generateDeepLinks`
 ```kotlin
 include(
@@ -36,8 +35,8 @@ dependencies {
     implementation(project(":navigation-deep-links"))
 }
 ```
-#### Not necessary 
-If you want additional behavior, you can config the flags. 
+#### Advanced options
+If you want additional behavior you can config the flags. 
 ```kotlin
 configure<family.amma.deep_link.gradle_plugin.DeepLinksPluginExtension> {
     generateByDestinations = true // Generation of a separate file with deep links for each destination. 
@@ -156,7 +155,7 @@ public sealed class ModuleB : GeneratedDeepLink {
 ```
 
 ## Using from fragments
-[Example of start](https://github.com/AMMA-Family/android-navigation-deeplinks/blob/master/sample/module-a/src/main/kotlin/family/amma/module_a/FirstFragment.kt)
+[Example of the start fragment](https://github.com/AMMA-Family/android-navigation-deeplinks/blob/master/sample/module-a/src/main/kotlin/family/amma/module_a/FirstFragment.kt)
 ```kotlin
 class FirstFragment : Fragment(R.layout.fragment_first) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -181,7 +180,7 @@ class FirstFragment : Fragment(R.layout.fragment_first) {
 private inline fun GeneratedDeepLink.toNavDeepLinkRequest(block: NavDeepLinkRequest.Builder.() -> Unit = {}) =
     NavDeepLinkRequest.Builder.fromUri(Uri.parse(this.uri)).also(block).build()
 ```
-[Example of finish](https://github.com/AMMA-Family/android-navigation-deeplinks/blob/master/sample/module-b/src/main/kotlin/family/amma/module_b/SecondFragment.kt)
+[Example of the finish fragment](https://github.com/AMMA-Family/android-navigation-deeplinks/blob/master/sample/module-b/src/main/kotlin/family/amma/module_b/SecondFragment.kt)
 ```kotlin
 class SecondFragment : Fragment(R.layout.fragment_second) {
     private val args by navArgs<SecondFragmentArgs>()
