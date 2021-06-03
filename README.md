@@ -1,5 +1,10 @@
 # Android navigation deep links
-This library goes through your navigation files, it pulls out information about deep links, generates code and puts it in a separate module `navigation_deep_links`.
+This library provides functionality for generating deep links.
+This is achieved using:
+1) goes through your navigation files
+2) it pulls out information about deep links
+3) generates code
+4) puts it in a separate module `navigation_deep_links`.
 
 ## Introduction
 #### Add the library to your `build.gradle.kts` file.
