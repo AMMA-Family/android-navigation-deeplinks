@@ -110,7 +110,7 @@ public sealed class SecondFragmentDeepLink : GeneratedDeepLink {
 }
 ```
 
-If we activate the `generateAdditionalInfo` flag:
+If we activate the `generateUriHierarchy` flag:
 ```kotlin
 public sealed class ModuleB : GeneratedDeepLink {
     public sealed class Http : ModuleB() {
