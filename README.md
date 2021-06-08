@@ -1,7 +1,7 @@
 # Android navigation deep links
 This library provides functionality for generating deep links.
 
-This is achieved using:
+This is achieved through the following steps:
 1) Goes through your navigation files
 2) It pulls out information about deep links
 3) Generates code
@@ -28,7 +28,7 @@ plugins {
 }
 ```
 #### After generating the module add it to the `settings.gradle.kts`:
-The module automatically generated after the build, but for manual launch `:generateDeepLinks`
+The module is automatically generated after the build, but it can also be generated with `:generateDeepLinks`
 ```kotlin
 include(
     ...,
@@ -45,7 +45,7 @@ dependencies {
 If you want additional behavior you can config the flags. 
 ```kotlin
 configure<family.amma.deep_link.gradle_plugin.DeepLinksPluginExtension> {
-    generateByDestinations = true // Generation of a separate file with deep links for each destination. 
+    generateByDestinations = true // Generation of separate files with deep links for each destination. 
     generateUriHierarchy = false // Generating a hierarchy of deep links based on their url.
     generateAdditionalInfo = false // Generation of additional information for all types of generation: names, protocol, host and path segments.
 }
@@ -88,7 +88,7 @@ public sealed class SecondFragmentDeepLink : GeneratedDeepLink {
     }
 }
 ```
-If we activate the `generateAdditionalInfo` flag:
+If flag `generateAdditionalInfo` is enabled:
 ```kotlin
 public sealed class SecondFragmentDeepLink : GeneratedDeepLink {
     public data class BarFoo(
@@ -110,7 +110,7 @@ public sealed class SecondFragmentDeepLink : GeneratedDeepLink {
 }
 ```
 
-If we activate the `generateUriHierarchy` flag:
+If flag `generateUriHierarchy` is enabled:
 ```kotlin
 public sealed class ModuleB : GeneratedDeepLink {
     public sealed class Http : ModuleB() {
