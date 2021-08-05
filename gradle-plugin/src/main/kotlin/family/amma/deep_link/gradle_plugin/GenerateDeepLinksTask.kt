@@ -1,24 +1,26 @@
 package family.amma.deep_link.gradle_plugin
 
-import family.amma.deep_link.generator.ext.filterUnique
 import family.amma.deep_link.generator.main.generateDeepLinks
 import family.amma.deep_link.generator.main.GeneratorParams
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.file.FileCollection
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.ChangeType
+import org.gradle.work.Incremental
 import org.gradle.work.InputChanges
 import java.io.File
 
 open class GenerateDeepLinksTask : DefaultTask() {
     /** Package of R file. */
     @get:Input
-    lateinit var rFilePackage: String
+    lateinit var rFilePackage: Provider<String>
 
     @get:Input
     lateinit var applicationId: String
@@ -26,8 +28,9 @@ open class GenerateDeepLinksTask : DefaultTask() {
     @get:Input
     lateinit var generatorParams: GeneratorParams
 
+    @get:Incremental
     @get:InputFiles
-    var navigationFiles: List<File> = emptyList()
+    lateinit var navigationFiles: FileCollection
 
     @get:OutputDirectory
     lateinit var buildDir: File
@@ -40,15 +43,12 @@ open class GenerateDeepLinksTask : DefaultTask() {
 
     @TaskAction
     fun execute(inputChanges: InputChanges) {
-        val navFiles = navigationFiles.filterUnique()
         if (inputChanges.isIncremental) {
-            @Suppress("UnstableApiUsage")
-            val inputCollection = project.objects.fileCollection().also { it.setFrom(navFiles) }
             doIncrementalTaskAction(
-                changedInputs = inputChanges.getFileChanges(inputCollection).map { it.file to it.changeType }.toMap(),
+                changedInputs = inputChanges.getFileChanges(navigationFiles).map { it.file to it.changeType }.toMap(),
             )
         } else {
-            doFullTaskAction(navFiles)
+            doFullTaskAction(navigationFiles.files.toList())
         }
 
         copyToMainModule()
@@ -82,7 +82,7 @@ open class GenerateDeepLinksTask : DefaultTask() {
     private fun generateDeepLinks(navFiles: List<File>) {
         val dispatcher = Dispatchers.IO
         runBlocking(dispatcher) {
-            generateDeepLinks(rFilePackage, applicationId, navFiles, buildDir, generatorParams, dispatcher)
+            generateDeepLinks(rFilePackage.get(), applicationId, navFiles, buildDir, generatorParams, dispatcher)
         }
     }
 

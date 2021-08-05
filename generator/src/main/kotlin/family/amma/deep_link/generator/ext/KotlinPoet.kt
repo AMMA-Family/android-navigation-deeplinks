@@ -8,7 +8,7 @@ import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import family.amma.deep_link.generator.parser.STRING_FORMAT
+import kotlin.reflect.KClass
 
 /**
  * Example:
@@ -95,10 +95,10 @@ inline fun <reified T> toListCodeBlock(format: String, list: List<T>): CodeBlock
         .addStatement("listOf(${list.joinToString(prefix = "", postfix = "") { format }})", *list.toTypedArray())
         .build()
 
-internal fun constValProp(name: String, value: String) =
+internal fun constValProp(name: String, typeToFormat: Pair<KClass<*>, String>, value: String) =
     PropertySpec
-        .builder(name, String::class, KModifier.CONST)
-        .initializer(STRING_FORMAT, value)
+        .builder(name, typeToFormat.first, KModifier.CONST)
+        .initializer(typeToFormat.second, value)
         .build()
 
 internal fun listProp(name: String, value: CodeBlock) =

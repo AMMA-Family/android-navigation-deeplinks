@@ -47,9 +47,10 @@ internal fun deepLinkTypeSpec(
 private fun parsedUriProps(uri: Uri): List<PropertySpec> {
     val correctUri = uri.trimPartToParameters()
     val header = correctUri.header()
+    val typeToFormat = String::class to STRING_FORMAT
     return listOfNotNull(
-        header.protocol()?.let { constValProp("protocol", it) },
-        header.host()?.let { constValProp("host", it) },
+        header.protocol()?.let { constValProp("protocol", typeToFormat, it) },
+        header.host()?.let { constValProp("host", typeToFormat, it) },
         listProp("pathSegments", toListCodeBlock(STRING_FORMAT, correctUri.pathSegments()))
     )
 }

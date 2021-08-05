@@ -1,11 +1,7 @@
-# Android navigation deep links
-This library provides functionality for generating deep links.
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/family.amma/deeplinks-gradle-plugin/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/family.amma/deeplinks-gradle-plugin)
 
-This is achieved through the following steps:
-1) Goes through your navigation files
-2) It pulls out information about deep links
-3) Generates code
-4) Puts it in a separate module `navigation_deep_links`.
+# android-navigation-deeplinks
+This library goes through your navigation files, pulls out information about deep links, generates code and puts it in a separate module `navigation_deep_links`.
 
 ## Introduction
 #### Add the library to your `build.gradle.kts` file.
@@ -13,7 +9,7 @@ This is achieved through the following steps:
 buildscript {
     dependencies {
         ...
-        classpath("family.amma:deeplinks-gradle-plugin:1.0.2")
+        classpath("family.amma:deeplinks-gradle-plugin:<last_version>")
         // not necessary, but handy for working with taking arguments
         classpath("androidx.navigation:navigation-safe-args-gradle-plugin:2.3.5")
     }
@@ -27,8 +23,8 @@ plugins {
     id("androidx.navigation.safeargs.kotlin")
 }
 ```
-#### After generating the module add it to the `settings.gradle.kts`:
-The module is automatically generated after the build, but it can also be generated with `:generateDeepLinks`
+#### After generating the module add it to `settings.gradle.kts`:
+The module automatically generated after the build, but for manual launch `:generateDeepLinks`
 ```kotlin
 include(
     ...,
@@ -41,11 +37,11 @@ dependencies {
     implementation(project(":navigation-deep-links"))
 }
 ```
-#### Advanced options
-If you want additional behavior you can config the flags. 
+#### Not necessary 
+If you want additional behavior, you can config the flags. 
 ```kotlin
 configure<family.amma.deep_link.gradle_plugin.DeepLinksPluginExtension> {
-    generateByDestinations = true // Generation of separate files with deep links for each destination. 
+    generateByDestinations = true // Generation of a separate file with deep links for each destination. 
     generateUriHierarchy = false // Generating a hierarchy of deep links based on their url.
     generateAdditionalInfo = false // Generation of additional information for all types of generation: names, protocol, host and path segments.
 }
@@ -88,7 +84,7 @@ public sealed class SecondFragmentDeepLink : GeneratedDeepLink {
     }
 }
 ```
-If flag `generateAdditionalInfo` is enabled:
+If we activate the `generateAdditionalInfo` flag:
 ```kotlin
 public sealed class SecondFragmentDeepLink : GeneratedDeepLink {
     public data class BarFoo(
@@ -110,7 +106,7 @@ public sealed class SecondFragmentDeepLink : GeneratedDeepLink {
 }
 ```
 
-If flag `generateUriHierarchy` is enabled:
+If we activate the `generateAdditionalInfo` flag:
 ```kotlin
 public sealed class ModuleB : GeneratedDeepLink {
     public sealed class Http : ModuleB() {
@@ -161,7 +157,7 @@ public sealed class ModuleB : GeneratedDeepLink {
 ```
 
 ## Using from fragments
-[Example of the start fragment](https://github.com/AMMA-Family/android-navigation-deeplinks/blob/master/sample/module-a/src/main/kotlin/family/amma/module_a/FirstFragment.kt)
+[Example of start](https://github.com/AMMA-Family/android-navigation-deeplinks/blob/master/sample/module-a/src/main/kotlin/family/amma/module_a/FirstFragment.kt)
 ```kotlin
 class FirstFragment : Fragment(R.layout.fragment_first) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -186,7 +182,7 @@ class FirstFragment : Fragment(R.layout.fragment_first) {
 private inline fun GeneratedDeepLink.toNavDeepLinkRequest(block: NavDeepLinkRequest.Builder.() -> Unit = {}) =
     NavDeepLinkRequest.Builder.fromUri(Uri.parse(this.uri)).also(block).build()
 ```
-[Example of the finish fragment](https://github.com/AMMA-Family/android-navigation-deeplinks/blob/master/sample/module-b/src/main/kotlin/family/amma/module_b/SecondFragment.kt)
+[Example of finish](https://github.com/AMMA-Family/android-navigation-deeplinks/blob/master/sample/module-b/src/main/kotlin/family/amma/module_b/SecondFragment.kt)
 ```kotlin
 class SecondFragment : Fragment(R.layout.fragment_second) {
     private val args by navArgs<SecondFragmentArgs>()

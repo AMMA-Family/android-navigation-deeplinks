@@ -13,6 +13,7 @@ import family.amma.deep_link.generator.fileSpec.common.camelCaseName
 import family.amma.deep_link.generator.fileSpec.common.deepLinkTypeSpec
 import family.amma.deep_link.generator.fileSpec.common.indent
 import family.amma.deep_link.generator.main.GeneratorParams
+import family.amma.deep_link.generator.parser.STRING_FORMAT
 
 /** File for the hierarchical structure of deep links. */
 internal fun deepLinksFileSpecHierarchy(
@@ -60,7 +61,12 @@ private fun deepLinksTypeSpecListHierarchy(
     ): TypeSpec = deepLinkSealedClass(className, parent) {
         if (params.generateAdditionalInfo) {
             addType(
-                TypeSpec.companionObjectBuilder().addProperty(constValProp(name = "name", value = originalName)).build()
+                TypeSpec
+                    .companionObjectBuilder()
+                    .addProperty(
+                        constValProp(name = "name", typeToFormat = String::class to STRING_FORMAT, value = originalName)
+                    )
+                    .build()
             )
         }
         addTypes(deepLinksTypeSpecListHierarchy(deepLinkWithParentDest, params, parent = className, currentSegment + 1))
