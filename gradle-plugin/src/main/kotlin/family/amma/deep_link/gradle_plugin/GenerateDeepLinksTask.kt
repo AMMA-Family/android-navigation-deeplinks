@@ -48,7 +48,7 @@ open class GenerateDeepLinksTask : DefaultTask() {
                 changedInputs = inputChanges.getFileChanges(navigationFiles).map { it.file to it.changeType }.toMap(),
             )
         } else {
-            doFullTaskAction(navigationFiles.files.toList())
+            doFullTaskAction(navigationFiles.files)
         }
 
         copyToMainModule()
@@ -66,7 +66,7 @@ open class GenerateDeepLinksTask : DefaultTask() {
             .forEach(File::delete)
     }
 
-    private fun doFullTaskAction(navFiles: List<File>) {
+    private fun doFullTaskAction(navFiles: Collection<File>) {
         if (buildDir.exists() && !buildDir.deleteRecursively()) {
             project.logger.warn("Failed to clear build directory for deep links")
         }
@@ -79,7 +79,7 @@ open class GenerateDeepLinksTask : DefaultTask() {
         generateDeepLinks(navFiles)
     }
 
-    private fun generateDeepLinks(navFiles: List<File>) {
+    private fun generateDeepLinks(navFiles: Collection<File>) {
         val dispatcher = Dispatchers.IO
         runBlocking(dispatcher) {
             generateDeepLinks(rFilePackage.get(), applicationId, navFiles, buildDir, generatorParams, dispatcher)

@@ -24,7 +24,7 @@ import java.io.FileReader
 suspend fun generateDeepLinks(
     rFilePackage: String,
     applicationId: String,
-    navigationXmlFiles: List<File>,
+    navigationXmlFiles: Collection<File>,
     outputDir: File,
     params: GeneratorParams,
     dispatcher: CoroutineDispatcher

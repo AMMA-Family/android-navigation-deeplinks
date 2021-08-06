@@ -11,13 +11,14 @@ import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.ProviderFactory
 import java.io.File
+import javax.inject.Inject
 
 private const val PLUGIN_DIRNAME = "navigation-deep-links"
 private const val GENERATED_PATH = "generated/source/$PLUGIN_DIRNAME"
 private const val PLUGIN_PATH = "$PLUGIN_DIRNAME/src/main/kotlin"
 
 @Suppress("unused")
-abstract class DeepLinksPlugin protected constructor(val providerFactory: ProviderFactory) : Plugin<Project> {
+class DeepLinksPlugin @Inject constructor(val providerFactory: ProviderFactory) : Plugin<Project> {
     override fun apply(project: Project) {
         val pluginExtension = project.extensions.create(DeepLinksPluginExtension.NAME, DeepLinksPluginExtension::class.java)
 
