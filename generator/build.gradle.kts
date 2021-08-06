@@ -7,11 +7,7 @@ plugins {
     signing
 }
 
-sourceSets {
-    val main by getting {
-        java.srcDirs("src/main/kotlin")
-    }
-}
+sourceSets.forEach { it.java.srcDirs("src/${it.name}/kotlin") }
 
 tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile> {
     kotlinOptions {
@@ -25,6 +21,8 @@ dependencies {
 
     implementation(Dependency.xmlpull)
     implementation(Dependency.kotlinpoet)
+
+    testImplementation(kotlin("test"))
 }
 
 publish(

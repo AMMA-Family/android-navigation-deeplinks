@@ -6,6 +6,7 @@ import com.squareup.kotlinpoet.asTypeName
 import family.amma.deep_link.generator.entity.ResReference
 
 const val STRING_FORMAT = "%S"
+const val LITERALS_FORMAT = "%L"
 
 internal sealed class NavType {
     abstract fun typeName(): TypeName

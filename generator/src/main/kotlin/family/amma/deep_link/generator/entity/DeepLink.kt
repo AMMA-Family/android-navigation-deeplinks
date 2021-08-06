@@ -28,7 +28,10 @@ internal value class UriHeader(private val header: List<String>) {
 
     /** @return first part after '://'. */
     fun host(): String? =
-        header.drop(1).firstOrNull()?.takeWhile { it != '{' && it != '?' && it != '/' }
+        header
+            .let { if (it.size > 1) it.drop(1) else it }
+            .firstOrNull()
+            ?.takeWhile { it != '{' && it != '?' && it != '/' }
 }
 
 /** @return list of protocol, host and path segments. */
