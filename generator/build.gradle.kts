@@ -9,12 +9,6 @@ plugins {
 
 sourceSets.forEach { it.java.srcDirs("src/${it.name}/kotlin") }
 
-tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xno-kotlin-nothing-value-exception", "-Xinline-classes")
-    }
-}
-
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(Dependency.Kotlin.X.Coroutines.core)

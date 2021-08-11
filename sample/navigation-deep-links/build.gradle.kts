@@ -6,7 +6,7 @@ plugins {
 }
 
 sourceSets {
-    val main by getting {
+    named("main") {
         java.srcDirs("src/main/kotlin")
     }
 }

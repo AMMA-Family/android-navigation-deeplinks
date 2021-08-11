@@ -6,31 +6,30 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
-import org.gradle.api.file.FileCollection
-import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.*
 import org.gradle.work.ChangeType
 import org.gradle.work.Incremental
 import org.gradle.work.InputChanges
 import java.io.File
 
-open class GenerateDeepLinksTask : DefaultTask() {
+@CacheableTask
+abstract class GenerateDeepLinksTask : DefaultTask() {
     /** Package of R file. */
     @get:Input
-    lateinit var rFilePackage: Provider<String>
+    abstract val rFilePackage: Property<String>
 
     @get:Input
-    lateinit var applicationId: String
+    abstract val applicationId: Property<String>
+
+    @get:PathSensitive(PathSensitivity.ABSOLUTE)
+    @get:Incremental
+    @get:InputFiles
+    abstract val navigationFiles: ConfigurableFileCollection
 
     @get:Input
     lateinit var generatorParams: GeneratorParams
-
-    @get:Incremental
-    @get:InputFiles
-    lateinit var navigationFiles: FileCollection
 
     @get:OutputDirectory
     lateinit var buildDir: File
@@ -82,7 +81,7 @@ open class GenerateDeepLinksTask : DefaultTask() {
     private fun generateDeepLinks(navFiles: Collection<File>) {
         val dispatcher = Dispatchers.IO
         runBlocking(dispatcher) {
-            generateDeepLinks(rFilePackage.get(), applicationId, navFiles, buildDir, generatorParams, dispatcher)
+            generateDeepLinks(rFilePackage.get(), applicationId.orNull ?: "", navFiles, buildDir, generatorParams, dispatcher)
         }
     }
 
@@ -124,7 +123,7 @@ private const val gradleKtsFileText = """
     }
     
     sourceSets {
-        val main by getting {
+        named("main") {
             java.srcDirs("src/main/kotlin")
         }
     }

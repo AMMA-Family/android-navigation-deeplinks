@@ -8,12 +8,12 @@ plugins {
 }
 
 android {
-    compileSdkVersion(AndroidProject.compileSdkVersion)
-    buildToolsVersion(AndroidProject.buildToolsVersion)
+    compileSdk = AndroidProject.compileSdkVersion
+    buildToolsVersion = AndroidProject.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion(AndroidProject.minSdkVersion)
-        targetSdkVersion(AndroidProject.targetSdkVersion)
+        minSdk = AndroidProject.minSdkVersion
+        targetSdk = AndroidProject.targetSdkVersion
     }
 
     buildTypes {
@@ -29,7 +29,7 @@ android {
     }
 
     sourceSets {
-        val main by getting {
+        named("main") {
             java.srcDirs("src/main/kotlin")
         }
     }
