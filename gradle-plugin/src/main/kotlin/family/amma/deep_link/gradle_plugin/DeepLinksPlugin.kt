@@ -1,14 +1,18 @@
 package family.amma.deep_link.gradle_plugin
 
+import com.android.build.api.extension.AndroidComponentsExtension
+import com.android.build.api.variant.DynamicFeatureVariant
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
+import com.android.build.gradle.api.ApplicationVariant
 import com.android.build.gradle.api.BaseVariant
 import groovy.xml.XmlSlurper
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
+import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import java.io.File
 import javax.inject.Inject
@@ -28,19 +32,45 @@ class DeepLinksPlugin @Inject constructor(val providerFactory: ProviderFactory) 
         val pluginDir = File(project.rootDir, PLUGIN_DIRNAME)
         val buildDir = File(project.buildDir, GENERATED_PATH)
 
+        val applicationIds = mutableMapOf<String, Provider<String>>()
+        val variantExtension =
+            project.extensions.findByType(AndroidComponentsExtension::class.java)
+                ?: throw GradleException("deeplinks plugin must be used with android plugin")
+        variantExtension.onVariants { variant ->
+            when (variant) {
+                is ApplicationVariant, is DynamicFeatureVariant ->
+                    // Using reflection for AGP 7.0+ cause it can't resolve that
+                    // DynamicFeatureVariant implements GeneratesApk so the `applicationId`
+                    // property is actually available. Once we upgrade to 7.0 we will use
+                    // getNamespace().
+                    variant::class.java.getDeclaredMethod("getApplicationId").let { method ->
+                        method.trySetAccessible()
+                        applicationIds.getOrPut(variant.name) {
+                            @kotlin.Suppress("UNCHECKED_CAST")
+                            method.invoke(variant) as Provider<String>
+                        }
+                    }
+            }
+        }
+
         forEachVariants(baseExtension) { variant: BaseVariant ->
             val generateDeepLinksTask = project
                 .tasks
                 .create("generateDeepLinks${variant.name.capitalize()}", GenerateDeepLinksTask::class.java) { task ->
-                    task.rFilePackage = variant.rFilePackage()
-                    task.applicationId = variant.applicationId
+                    task.rFilePackage.set(variant.rFilePackage())
+                    task.applicationId.set(
+                        // this will only put in the case where the extension is a Library module
+                        // and should be superseded by `getNamespace()` in agp 7.0+
+                        applicationIds.getOrPut(variant.name) {
+                            providerFactory.provider { variant.applicationId }
+                        }
+                    )
                     task.generatorParams = pluginExtension.toGeneratorParams()
-                    task.navigationFiles = navigationFiles(variant, project)
+                    task.navigationFiles.setFrom(navigationFiles(variant, project))
                     task.outputDir = outputDir
                     task.pluginDir = pluginDir
                     task.buildDir = buildDir
                 }
-            variant.applicationIdTextResource?.let { generateDeepLinksTask.dependsOn(it) }
             variant.registerJavaGeneratingTask(generateDeepLinksTask, buildDir)
         }
     }
@@ -49,15 +79,13 @@ class DeepLinksPlugin @Inject constructor(val providerFactory: ProviderFactory) 
         val fileProvider = providerFactory.provider {
             variant.sourceSets
                 .flatMap { it.resDirectories }
-                .mapNotNull {
-                    File(it, "navigation").let { navFolder ->
-                        if (navFolder.exists() && navFolder.isDirectory) navFolder else null
-                    }
+                .mapNotNull { resDir ->
+                    File(resDir, "navigation").takeIf { it.exists() && it.isDirectory }
                 }
-                .flatMap { navFolder -> navFolder.listFiles().asIterable() }
-                .filter { file -> file.isFile }
-                .groupBy { file -> file.name }
-                .map { entry -> entry.value.last() }
+                .flatMap { navFolder -> navFolder.listFiles().orEmpty().asIterable() }
+                .groupBy(File::getName)
+                .values
+                .map { it.last() }
         }
         return project.files(fileProvider)
     }

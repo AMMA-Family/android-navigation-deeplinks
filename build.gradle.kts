@@ -14,6 +14,7 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        mavenLocal()
         maven("https://plugins.gradle.org/m2/")
         maven("https://s01.oss.sonatype.org/content/groups/public/")
     }

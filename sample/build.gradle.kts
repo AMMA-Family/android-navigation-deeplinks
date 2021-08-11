@@ -10,7 +10,7 @@ buildscript {
         classpath(BuildPlugin.gradle)
         classpath(BuildPlugin.kotlin)
         classpath(BuildPlugin.safeArgs)
-        classpath("family.amma:deeplinks-gradle-plugin:1.0.6")
+        classpath("family.amma:deeplinks-gradle-plugin:1.0.7")
     }
 }
 

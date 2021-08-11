@@ -27,16 +27,16 @@ gradlePlugin {
 }
 
 sourceSets {
-    val main by getting {
+    named("main") {
         java.srcDirs("src/main/kotlin")
     }
 }
 
 dependencies {
     implementation(kotlin("stdlib"))
+    compileOnly(gradleApi())
 
     implementation(BuildPlugin.gradle)
-    implementation(gradleApi())
     implementation(Dependency.Kotlin.X.Serialization.core)
     implementation(Dependency.Kotlin.X.Coroutines.core)
 

@@ -1,10 +1,10 @@
 @file:JvmMultifileClass
 
 private const val kotlinVersion = "1.5.21"
-private const val navigationVersion = "2.3.5"
+private const val navigationVersion = "2.4.0-alpha06"
 
 object BuildPlugin {
-    const val gradle = "com.android.tools.build:gradle:4.2.1"
+    const val gradle = "com.android.tools.build:gradle:7.0.0"
     const val kotlin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     const val safeArgs = "androidx.navigation:navigation-safe-args-gradle-plugin:$navigationVersion"
 }
