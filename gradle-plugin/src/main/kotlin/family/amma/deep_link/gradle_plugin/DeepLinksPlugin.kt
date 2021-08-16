@@ -66,7 +66,7 @@ class DeepLinksPlugin @Inject constructor(val providerFactory: ProviderFactory) 
                         }
                     )
                     task.generatorParams = pluginExtension.toGeneratorParams()
-                    task.navigationFiles.setFrom(navigationFiles(variant, project))
+                    task.navigationFiles.setFrom(navigationFiles(variant))
                     task.outputDir = outputDir
                     task.pluginDir = pluginDir
                     task.buildDir = buildDir
@@ -75,27 +75,23 @@ class DeepLinksPlugin @Inject constructor(val providerFactory: ProviderFactory) 
         }
     }
 
-    private fun navigationFiles(variant: BaseVariant, project: Project): FileCollection {
-        val fileProvider = providerFactory.provider {
-            variant.sourceSets
-                .flatMap { it.resDirectories }
-                .mapNotNull { resDir ->
-                    File(resDir, "navigation").takeIf { it.exists() && it.isDirectory }
-                }
-                .flatMap { navFolder -> navFolder.listFiles().orEmpty().asIterable() }
-                .groupBy(File::getName)
-                .values
-                .map { it.last() }
-        }
-        return project.files(fileProvider)
-    }
+    private fun navigationFiles(variant: BaseVariant): List<File> =
+        variant.sourceSets
+            .flatMap { it.resDirectories }
+            .mapNotNull { resDir ->
+                File(resDir, "navigation").takeIf { it.exists() && it.isDirectory }
+            }
+            .flatMap { navFolder -> navFolder.listFiles().orEmpty().asIterable() }
+            .groupBy(File::getName)
+            .values
+            .map { it.last() }
 
-    private fun BaseVariant.rFilePackage() = providerFactory.provider {
+    private fun BaseVariant.rFilePackage(): String {
         val mainSourceSet = sourceSets.find { it.name == "main" }
-        val sourceSet = mainSourceSet ?: sourceSets[0]
+        val sourceSet = mainSourceSet ?: sourceSets.first()
         val manifest = sourceSet.manifestFile
         val parsed = XmlSlurper(false, false).parse(manifest)
-        parsed.getProperty("@package").toString()
+        return parsed.getProperty("@package").toString()
     }
 }
 
