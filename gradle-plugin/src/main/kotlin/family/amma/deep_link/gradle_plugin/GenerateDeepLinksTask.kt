@@ -14,7 +14,6 @@ import org.gradle.work.Incremental
 import org.gradle.work.InputChanges
 import java.io.File
 
-@CacheableTask
 abstract class GenerateDeepLinksTask : DefaultTask() {
     /** Package of R file. */
     @get:Input
