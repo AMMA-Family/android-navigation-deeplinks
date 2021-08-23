@@ -56,7 +56,7 @@ class DeepLinksPlugin @Inject constructor(val providerFactory: ProviderFactory) 
         forEachVariants(baseExtension) { variant: BaseVariant ->
             val generateDeepLinksTask = project
                 .tasks
-                .create("generateDeepLinks${variant.name.capitalize()}", GenerateDeepLinksTask::class.java) { task ->
+                .create("generateDeepLinks${variant.name.replaceFirstChar(Char::uppercaseChar)}", GenerateDeepLinksTask::class.java) { task ->
                     task.rFilePackage.set(variant.rFilePackage())
                     task.applicationId.set(
                         // this will only put in the case where the extension is a Library module

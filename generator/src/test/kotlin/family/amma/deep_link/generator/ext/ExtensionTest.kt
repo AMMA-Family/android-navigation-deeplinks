@@ -1,6 +1,6 @@
 package family.amma.deep_link.generator.ext
 
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ExtensionTest {
@@ -24,5 +24,11 @@ class ExtensionTest {
     @Test
     fun testSnakeCase() {
         assertEquals(expected = "foo_bar_zoo", actual = "FooBarZoo".toSnakeCase())
+    }
+
+    @Test
+    fun endsWithIfNotYet() {
+        assertEquals(expected = "foo_bar_zoo", actual = "foo_bar".endsWithIfNotYet("_zoo"))
+        assertEquals(expected = "foo_bar_zoo", actual = "foo_bar_zoo".endsWithIfNotYet("_zoo"))
     }
 }

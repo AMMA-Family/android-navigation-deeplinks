@@ -11,4 +11,6 @@ internal data class ResReference(val packageName: String, val resType: String, v
     val accessor = "$packageName.R.$resType.$identifier"
 
     fun isId() = resType == "id"
+
+    override fun toString(): String = accessor
 }

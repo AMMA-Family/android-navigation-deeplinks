@@ -1,5 +1,6 @@
 package family.amma.deep_link.generator.ext
 
+import family.amma.deep_link.generator.entity.Uri
 import java.util.Locale
 
 private val camelRegex = "(?<=[a-zA-Z])[A-Z]".toRegex()
@@ -22,3 +23,7 @@ private fun String.snakeToLowerCamelCase(locale: Locale): String =
     snakeRegex.replace(this) {
         it.value.replace("_", "").uppercase(locale)
     }
+
+/** Adds [ending] to [this] line if it does not end with it. */
+fun String.endsWithIfNotYet(ending: String): Uri =
+    takeIf { it.endsWith(ending, ignoreCase = true) } ?: this + ending

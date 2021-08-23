@@ -37,7 +37,7 @@ private const val NAMESPACE_ANDROID = "http://schemas.android.com/apk/res/androi
 internal class NavParser(
     private val parser: XmlPositionParser,
     private val rFilePackage: String,
-    private val applicationId: String
+    private val applicationId: ApplicationId
 ) {
     /** @return parsed [ParsedDestination] from xml. */
     suspend fun parseDestination(dispatcher: CoroutineDispatcher): ParsedDestination? {
@@ -140,7 +140,7 @@ internal class NavParser(
 }
 
 /** @return camel case name for destination. */
-private fun createName(name: String?, applicationId: String, id: ResReference?): ClassName? =
+private fun createName(name: String?, applicationId: ApplicationId, id: ResReference?): ClassName? =
     if (name != null && name.isNotEmpty()) {
         val specifiedPackage = name.substringBeforeLast('.', "")
         val classPackage = if (name.startsWith(".")) {

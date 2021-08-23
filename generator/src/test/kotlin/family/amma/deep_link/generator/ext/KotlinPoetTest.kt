@@ -1,13 +1,10 @@
 package family.amma.deep_link.generator.ext
 
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.TypeSpec
-import com.squareup.kotlinpoet.asTypeName
+import com.squareup.kotlinpoet.*
 import family.amma.deep_link.generator.entity.GenerateProp
 import family.amma.deep_link.generator.parser.LITERALS_FORMAT
 import family.amma.deep_link.generator.parser.STRING_FORMAT
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class KotlinPoetTest {
@@ -82,6 +79,29 @@ class KotlinPoetTest {
         assertEquals(
             expected = "val userIds: kotlin.collections.List<kotlin.String> = listOf(1, 2, 3)",
             actual = listProp(name = "userIds", value = toListCodeBlock(LITERALS_FORMAT, list = listOf(1, 2, 3))).toString().trim()
+        )
+    }
+
+    @Test
+    fun deepLinkSealedClass() {
+        val fooBarClassName = ClassName("packg", "FooBar")
+        assertEquals(
+            expected = "public sealed class FooBar : deep_link.GeneratedDeepLink",
+            actual = deepLinkSealedClass(fooBarClassName, parentClass = null).toString().trim()
+        )
+        assertEquals(
+            expected = """
+                public sealed class FooBar : another.packg.ZOO() {
+                  public class F : packg.FooBar()
+                }
+            """.trimIndent(),
+            actual = deepLinkSealedClass(
+                className = fooBarClassName,
+                parentClass = ClassName("another.packg", "ZOO"),
+                additional = {
+                    addType(TypeSpec.classBuilder("F").superclass(fooBarClassName).build())
+                }
+            ).toString().trim()
         )
     }
 }
