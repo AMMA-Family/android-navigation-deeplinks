@@ -17,6 +17,7 @@ dependencies {
     implementation(Dependency.kotlinpoet)
 
     testImplementation(kotlin("test"))
+    implementation(Dependency.Test.mockk)
 }
 
 publish(

@@ -15,6 +15,9 @@ open class DeepLinksPluginExtension {
     /** If true - asynchronous parsing of hml files, if false - synchronous. */
     var isAsyncParsing: Boolean = true
 
+    /** Is logging enabled for debugging. */
+    var isLoggingEnabled: Boolean = false
+
     internal companion object {
         const val NAME = "deepLinksPluginExtension"
     }
@@ -25,5 +28,6 @@ internal fun DeepLinksPluginExtension.toGeneratorParams() =
         generateByDestinations = generateByDestinations,
         generateUriHierarchy = generateUriHierarchy,
         generateAdditionalInfo = generateAdditionalInfo,
-        isAsyncParsing = isAsyncParsing
+        isAsyncParsing = isAsyncParsing,
+        isLoggingEnabled = isLoggingEnabled
     )

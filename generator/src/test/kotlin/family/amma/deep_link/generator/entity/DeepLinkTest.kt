@@ -1,6 +1,6 @@
 package family.amma.deep_link.generator.entity
 
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class DeepLinkTest {

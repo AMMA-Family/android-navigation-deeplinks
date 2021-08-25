@@ -1,5 +1,6 @@
 package family.amma.deep_link.gradle_plugin
 
+import family.amma.deep_link.generator.entity.ApplicationId
 import family.amma.deep_link.generator.main.generateDeepLinks
 import family.amma.deep_link.generator.main.GeneratorParams
 import kotlinx.coroutines.Dispatchers
@@ -80,7 +81,15 @@ abstract class GenerateDeepLinksTask : DefaultTask() {
     private fun generateDeepLinks(navFiles: Collection<File>) {
         val dispatcher = Dispatchers.IO
         runBlocking(dispatcher) {
-            generateDeepLinks(rFilePackage.get(), applicationId.orNull ?: "", navFiles, buildDir, generatorParams, dispatcher)
+            generateDeepLinks(
+                rFilePackage = rFilePackage.get(),
+                applicationId = ApplicationId(applicationId.get()),
+                navigationXmlFiles = navFiles,
+                outputDir = buildDir,
+                params = generatorParams,
+                dispatcher = dispatcher,
+                log = ::println
+            )
         }
     }
 

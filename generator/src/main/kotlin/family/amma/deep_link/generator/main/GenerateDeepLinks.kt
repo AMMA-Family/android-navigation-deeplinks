@@ -1,9 +1,9 @@
 package family.amma.deep_link.generator.main
 
 import com.squareup.kotlinpoet.FileSpec
+import family.amma.deep_link.generator.entity.*
 import family.amma.deep_link.generator.entity.DestinationModel
 import family.amma.deep_link.generator.entity.ParsedDestination
-import family.amma.deep_link.generator.entity.plus
 import family.amma.deep_link.generator.entity.toDestinationModel
 import family.amma.deep_link.generator.ext.replace
 import family.amma.deep_link.generator.fileSpec.common.generatedDeepLinkFileSpec
@@ -23,12 +23,18 @@ import java.io.FileReader
  */
 suspend fun generateDeepLinks(
     rFilePackage: String,
-    applicationId: String,
+    applicationId: ApplicationId,
     navigationXmlFiles: Collection<File>,
     outputDir: File,
     params: GeneratorParams,
-    dispatcher: CoroutineDispatcher
+    dispatcher: CoroutineDispatcher,
+    log: (String) -> Unit = ::println,
 ) = withContext(dispatcher) {
+    if (params.isLoggingEnabled) {
+        log("--------------------------------------- Deep links files start ---------------------------------------")
+        navigationXmlFiles.forEach { log(it.name) }
+        log("\n")
+    }
     if (params.isAsyncParsing) {
         navigationXmlFiles
             .map { navFile -> async(dispatcher) { parseNavigationFile(rFilePackage, applicationId, navFile, dispatcher) } }
@@ -38,7 +44,7 @@ suspend fun generateDeepLinks(
         navigationXmlFiles
             .mapNotNull { parseNavigationFile(rFilePackage, applicationId, it, dispatcher) }
     }
-        .toFileSpecList(applicationId, params)
+        .toFileSpecList(applicationId, params, log)
         .plus(generatedDeepLinkFileSpec())
         .forEach { fileSpec -> fileSpec.writeTo(outputDir) }
 }
@@ -47,7 +53,7 @@ suspend fun generateDeepLinks(
 @Suppress("BlockingMethodInNonBlockingContext")
 private suspend fun parseNavigationFile(
     rFilePackage: String,
-    applicationId: String,
+    applicationId: ApplicationId,
     navigationXml: File,
     dispatcher: CoroutineDispatcher
 ): ParsedDestination? = withContext(dispatcher) {
@@ -60,10 +66,21 @@ private suspend fun parseNavigationFile(
 }
 
 /** @return file specifications for subsequent generation for [ParsedDestination]. */
-private fun List<ParsedDestination>.toFileSpecList(applicationId: String, params: GeneratorParams): List<FileSpec> =
+private fun List<ParsedDestination>.toFileSpecList(
+    applicationId: ApplicationId,
+    params: GeneratorParams,
+    log: (String) -> Unit
+): List<FileSpec> =
     map(::toDestinationList)
         .flatten()
         .filter { it.deepLinks.isNotEmpty() }
+        .also {
+            if (params.isLoggingEnabled) {
+                log("--------------------------------------- Deep links destinations start ---------------------------------------")
+                for (destination in this) log(destination.toString())
+                log("\n")
+            }
+        }
         .let(::merge)
         .let { destinations: List<DestinationModel> ->
             listOf(

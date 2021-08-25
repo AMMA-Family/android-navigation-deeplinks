@@ -44,4 +44,18 @@ internal data class ParsedDestination(
     val deepLinks: List<DeepLink>,
     val args: List<DestArgument>,
     val nested: List<ParsedDestination> = emptyList()
-)
+) {
+    override fun toString(): String = stringify(spaces = 0)
+
+    private fun stringify(spaces: Int): String {
+        val spacesString = (0 until spaces).joinToString(separator = "") { " " }
+        return """${spacesString}ParsedDestination(
+    ${spacesString}id=$id,
+    ${spacesString}name=$name,
+    ${spacesString}deepLinks=${deepLinks.map { "\n$spacesString$spacesString$it" }},
+    ${spacesString}args=${args.map { "\n$spacesString$spacesString$it" }},
+    ${spacesString}nested=${nested.map { "\n" + spacesString + it.stringify(spaces + 8) }}
+${spacesString})
+    """
+    }
+}

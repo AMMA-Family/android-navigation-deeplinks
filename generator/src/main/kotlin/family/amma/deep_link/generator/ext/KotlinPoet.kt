@@ -1,13 +1,9 @@
 package family.amma.deep_link.generator.ext
 
-import com.squareup.kotlinpoet.CodeBlock
+import com.squareup.kotlinpoet.*
 import family.amma.deep_link.generator.entity.GenerateProp
-import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.ParameterSpec
-import com.squareup.kotlinpoet.PropertySpec
-import com.squareup.kotlinpoet.TypeSpec
-import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import family.amma.deep_link.generator.fileSpec.generatedDeepLink
 import kotlin.reflect.KClass
 
 /**
@@ -106,3 +102,21 @@ internal fun listProp(name: String, value: CodeBlock) =
         .builder(name, List::class.parameterizedBy(String::class))
         .initializer(value)
         .build()
+
+internal fun deepLinkSealedClass(
+    className: ClassName,
+    parentClass: ClassName?,
+    additional: TypeSpec.Builder.() -> Unit = {}
+) = TypeSpec
+    .classBuilder(className)
+    .addModifiers(KModifier.SEALED)
+    .deepLinkSuperType(parentClass)
+    .apply(additional)
+    .build()
+
+private fun TypeSpec.Builder.deepLinkSuperType(parentClass: ClassName?) =
+    if (parentClass != null) {
+        superclass(parentClass)
+    } else {
+        addSuperinterface(generatedDeepLink)
+    }

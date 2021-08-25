@@ -45,6 +45,7 @@ configure<family.amma.deep_link.gradle_plugin.DeepLinksPluginExtension> {
     generateByDestinations = true
     generateUriHierarchy = true
     generateAdditionalInfo = true
+    isLoggingEnabled = true
 }
 
 dependencies {
