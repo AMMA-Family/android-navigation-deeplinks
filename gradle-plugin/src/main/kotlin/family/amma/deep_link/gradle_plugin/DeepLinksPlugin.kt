@@ -1,6 +1,6 @@
 package family.amma.deep_link.gradle_plugin
 
-import com.android.build.api.extension.AndroidComponentsExtension
+import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.DynamicFeatureVariant
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.BaseExtension

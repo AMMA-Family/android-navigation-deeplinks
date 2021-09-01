@@ -42,7 +42,7 @@ abstract class GenerateDeepLinksTask : DefaultTask() {
 
     @TaskAction
     fun execute(inputChanges: InputChanges) {
-        if (inputChanges.isIncremental) {
+        if (inputChanges.isIncremental && !generatorParams.generateUriHierarchy) {
             doIncrementalTaskAction(
                 changedInputs = inputChanges.getFileChanges(navigationFiles).map { it.file to it.changeType }.toMap(),
             )

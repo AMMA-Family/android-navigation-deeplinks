@@ -6,7 +6,7 @@ open class DeepLinksPluginExtension {
     /** Generation of a separate file with deep links for each destination. */
     var generateByDestinations: Boolean = true
 
-    /** Generating a hierarchy of deep links based on their url. */
+    /** Generating a hierarchy of deep links based on their url. Important: this flag disables incremental compilation. */
     var generateUriHierarchy: Boolean = false
 
     /** Generation of additional information for all types of generation: names, protocol, host and path segments. */

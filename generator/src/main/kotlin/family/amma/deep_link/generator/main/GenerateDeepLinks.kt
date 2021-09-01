@@ -31,9 +31,8 @@ suspend fun generateDeepLinks(
     log: (String) -> Unit = ::println,
 ) = withContext(dispatcher) {
     if (params.isLoggingEnabled) {
-        log("--------------------------------------- Deep links files start ---------------------------------------")
+        log("--------------------------------------- Deep links files ---------------------------------------")
         navigationXmlFiles.forEach { log(it.name) }
-        log("\n")
     }
     if (params.isAsyncParsing) {
         navigationXmlFiles
@@ -76,9 +75,8 @@ private fun List<ParsedDestination>.toFileSpecList(
         .filter { it.deepLinks.isNotEmpty() }
         .also {
             if (params.isLoggingEnabled) {
-                log("--------------------------------------- Deep links destinations start ---------------------------------------")
+                log("--------------------------------------- Deep links destinations ---------------------------------------")
                 for (destination in this) log(destination.toString())
-                log("\n")
             }
         }
         .let(::merge)

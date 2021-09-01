@@ -26,12 +26,6 @@ gradlePlugin {
     }
 }
 
-sourceSets {
-    named("main") {
-        java.srcDirs("src/main/kotlin")
-    }
-}
-
 dependencies {
     implementation(kotlin("stdlib"))
 

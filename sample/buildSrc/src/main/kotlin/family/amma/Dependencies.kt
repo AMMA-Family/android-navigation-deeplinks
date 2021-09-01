@@ -1,7 +1,7 @@
 @file:JvmMultifileClass
 
-private const val kotlinVersion = "1.5.21"
-private const val navigationVersion = "2.4.0-alpha07"
+private const val kotlinVersion = "1.5.30"
+private const val navigationVersion = "2.3.5"
 
 object BuildPlugin {
     const val gradle = "com.android.tools.build:gradle:7.0.1"
