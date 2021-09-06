@@ -2,9 +2,8 @@ package family.amma.deep_link.generator.ext
 
 import com.squareup.kotlinpoet.*
 import family.amma.deep_link.generator.entity.GenerateProp
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import family.amma.deep_link.generator.fileSpec.generatedDeepLink
-import kotlin.reflect.KClass
+import family.amma.deep_link.generator.fileSpec.common.GeneratedDeepLink
+import family.amma.deep_link.generator.main.NavType
 
 /**
  * Example:
@@ -85,21 +84,27 @@ internal fun TypeSpec.Builder.addConstructorWithProps(props: List<GenerateProp>)
  * listOf("lol", "kek", "azaza")
  * ```
  */
-inline fun <reified T> toListCodeBlock(format: String, list: List<T>): CodeBlock =
+internal inline fun <reified T> toListCodeBlock(type: NavType, list: List<T>): CodeBlock =
     CodeBlock
         .builder()
-        .addStatement("listOf(${list.joinToString(prefix = "", postfix = "") { format }})", *list.toTypedArray())
+        .addStatement("listOf(${list.joinToString(prefix = "", postfix = "") { type.format }})", *list.toTypedArray())
         .build()
 
-internal fun constValProp(name: String, typeToFormat: Pair<KClass<*>, String>, value: String) =
+internal fun constValProp(name: String, type: NavType, value: String) =
     PropertySpec
-        .builder(name, typeToFormat.first, KModifier.CONST)
-        .initializer(typeToFormat.second, value)
+        .builder(name, type.typeName, KModifier.CONST)
+        .initializer(type.format, value)
         .build()
 
-internal fun listProp(name: String, value: CodeBlock) =
+internal fun overrideValProp(name: String, type: NavType, value: String?) =
     PropertySpec
-        .builder(name, List::class.parameterizedBy(String::class))
+        .builder(name, type.typeName.let { if (value == null) it.copy(nullable = true) else it }, KModifier.OVERRIDE)
+        .initializer(type.format, value)
+        .build()
+
+internal fun listProp(name: String, type: ParameterizedTypeName, value: CodeBlock, vararg modifiers: KModifier) =
+    PropertySpec
+        .builder(name, type, *modifiers)
         .initializer(value)
         .build()
 
@@ -118,5 +123,5 @@ private fun TypeSpec.Builder.deepLinkSuperType(parentClass: ClassName?) =
     if (parentClass != null) {
         superclass(parentClass)
     } else {
-        addSuperinterface(generatedDeepLink)
+        addSuperinterface(GeneratedDeepLink.className)
     }

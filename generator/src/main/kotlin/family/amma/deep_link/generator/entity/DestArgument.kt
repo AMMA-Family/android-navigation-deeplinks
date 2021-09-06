@@ -1,8 +1,8 @@
 package family.amma.deep_link.generator.entity
 
-import family.amma.deep_link.generator.parser.NavType
-import family.amma.deep_link.generator.parser.NullValue
-import family.amma.deep_link.generator.parser.WriteableValue
+import family.amma.deep_link.generator.main.NavType
+import family.amma.deep_link.generator.main.NullValue
+import family.amma.deep_link.generator.main.WriteableValue
 
 /**
  * Argument of destination in xml.
@@ -22,8 +22,8 @@ internal data class DestArgument(
     val isNullable: Boolean = false
 ) {
     init {
-        if (isNullable && !type.allowsNullable()) {
-            throw IllegalArgumentException("Argument is nullable but type ${type.typeName()} cannot be nullable.")
+        if (isNullable && !type.allowsNullable) {
+            throw IllegalArgumentException("Argument is nullable but type ${type.typeName} cannot be nullable.")
         }
         if (!isNullable && defaultValue == NullValue) {
             throw IllegalArgumentException("Argument has null value but is not nullable.")

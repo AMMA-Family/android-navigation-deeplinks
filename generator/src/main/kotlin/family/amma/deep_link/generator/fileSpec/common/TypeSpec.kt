@@ -5,12 +5,9 @@ import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import family.amma.deep_link.generator.main.GeneratorParams
-import family.amma.deep_link.generator.parser.STRING_FORMAT
 import family.amma.deep_link.generator.entity.*
 import family.amma.deep_link.generator.ext.addConstructorWithProps
-import family.amma.deep_link.generator.ext.constValProp
-import family.amma.deep_link.generator.ext.listProp
-import family.amma.deep_link.generator.ext.toListCodeBlock
+import family.amma.deep_link.generator.main.nullable
 
 /** Object or data class for [deepLink]. */
 internal fun deepLinkTypeSpec(
@@ -33,27 +30,22 @@ internal fun deepLinkTypeSpec(
     }.let { builder ->
         if (params.generateAdditionalInfo) {
             if (deepLink.args.isNotEmpty()) {
-                builder.addType(TypeSpec.companionObjectBuilder().addProperties(parsedUriProps(deepLink.uri)).build())
+                builder.addType(
+                    TypeSpec.companionObjectBuilder()
+                        .addSuperinterface(DeepLinkAdditionalInfo.className)
+                        .addProperties(DeepLinkAdditionalInfo.parsedUriProps(deepLink.uri))
+                        .build()
+                )
             } else {
-                builder.addProperties(parsedUriProps(deepLink.uri))
+                builder
+                    .addSuperinterface(DeepLinkAdditionalInfo.className)
+                    .addProperties(DeepLinkAdditionalInfo.parsedUriProps(deepLink.uri))
             }
         } else {
             builder
         }
     }
         .build()
-
-/** @return list of props with additional info. */
-private fun parsedUriProps(uri: Uri): List<PropertySpec> {
-    val correctUri = uri.trimPartToParameters()
-    val header = correctUri.header()
-    val typeToFormat = String::class to STRING_FORMAT
-    return listOfNotNull(
-        header.protocol()?.let { constValProp("protocol", typeToFormat, it) },
-        header.host()?.let { constValProp("host", typeToFormat, it) },
-        listProp("pathSegments", toListCodeBlock(STRING_FORMAT, correctUri.pathSegments()))
-    )
-}
 
 /** Check all deep link args and return true, if there is no name match with the [destArgument]. */
 private fun noDestArgInDeepLink(destArgument: DestArgument, deepLinkArgs: List<DeepLinkArg>): Boolean {
@@ -99,7 +91,7 @@ private fun toProp(name: String, destinationArgs: List<DestArgument>, couldBeNul
         ?.let { arg ->
             GenerateProp(
                 name = name,
-                typeName = arg.type.typeName().let { if (couldBeNull) it.copy(nullable = arg.isNullable) else it },
+                typeName = if (couldBeNull) arg.type.nullable else arg.type.typeName,
                 defaultValue = arg.defaultValue?.write()
             )
         }

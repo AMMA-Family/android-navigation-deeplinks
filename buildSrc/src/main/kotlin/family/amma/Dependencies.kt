@@ -1,6 +1,6 @@
 @file:JvmMultifileClass
 
-private const val kotlinVersion = "1.5.21"
+private const val kotlinVersion = "1.5.30"
 
 object BuildPlugin {
     const val gradle = "com.android.tools.build:gradle:7.0.1"
@@ -18,7 +18,7 @@ object Dependency {
             }
 
             object Coroutines {
-                const val core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1"
+                const val core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2"
             }
         }
     }

@@ -10,6 +10,7 @@ import family.amma.deep_link.generator.entity.DestArgument
 import family.amma.deep_link.generator.entity.NavParserErrors
 import family.amma.deep_link.generator.entity.ParsedDestination
 import family.amma.deep_link.generator.entity.XmlPosition
+import family.amma.deep_link.generator.main.*
 import kotlinx.coroutines.CoroutineDispatcher
 
 private const val TAG_NAVIGATION = "navigation"
@@ -91,7 +92,7 @@ internal class NavParser(
         }
 
         val type = NavType.from(typeString)
-        if (nullable && !type.allowsNullable()) {
+        if (nullable && !type.allowsNullable) {
             showError(NavParserErrors.typeIsNotNullable(typeString), xmlPosition)
         }
 

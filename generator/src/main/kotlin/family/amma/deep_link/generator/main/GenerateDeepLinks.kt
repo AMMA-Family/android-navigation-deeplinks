@@ -6,7 +6,8 @@ import family.amma.deep_link.generator.entity.DestinationModel
 import family.amma.deep_link.generator.entity.ParsedDestination
 import family.amma.deep_link.generator.entity.toDestinationModel
 import family.amma.deep_link.generator.ext.replace
-import family.amma.deep_link.generator.fileSpec.common.generatedDeepLinkFileSpec
+import family.amma.deep_link.generator.fileSpec.common.DeepLinkAdditionalInfo
+import family.amma.deep_link.generator.fileSpec.common.GeneratedDeepLink
 import family.amma.deep_link.generator.fileSpec.deepLinksFileSpecByDestinations
 import family.amma.deep_link.generator.fileSpec.deepLinksFileSpecHierarchy
 import family.amma.deep_link.generator.parser.NavParser
@@ -44,7 +45,8 @@ suspend fun generateDeepLinks(
             .mapNotNull { parseNavigationFile(rFilePackage, applicationId, it, dispatcher) }
     }
         .toFileSpecList(applicationId, params, log)
-        .plus(generatedDeepLinkFileSpec())
+        .plus(GeneratedDeepLink.fileSpec())
+        .let { if (params.generateAdditionalInfo) it.plus(DeepLinkAdditionalInfo.fileSpec()) else it }
         .forEach { fileSpec -> fileSpec.writeTo(outputDir) }
 }
 
