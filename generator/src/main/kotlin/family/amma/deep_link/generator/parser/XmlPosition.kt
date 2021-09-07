@@ -1,4 +1,4 @@
-package family.amma.deep_link.generator.entity
+package family.amma.deep_link.generator.parser
 
 /**
  * @param name The name to the file.

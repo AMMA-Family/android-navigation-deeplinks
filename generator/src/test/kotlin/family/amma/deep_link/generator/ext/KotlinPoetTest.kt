@@ -2,10 +2,7 @@ package family.amma.deep_link.generator.ext
 
 import com.squareup.kotlinpoet.*
 import family.amma.deep_link.generator.entity.GenerateProp
-import family.amma.deep_link.generator.main.BoolType
-import family.amma.deep_link.generator.main.IntType
-import family.amma.deep_link.generator.main.StringType
-import family.amma.deep_link.generator.main.list
+import family.amma.deep_link.generator.main.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -36,7 +33,7 @@ class KotlinPoetTest {
                 .addConstructorWithProps(
                     listOf(
                         GenerateProp(name = "foo", type = IntType, defaultValue = CodeBlock.of("10")),
-                        GenerateProp(name = "bar", type = StringType, defaultValue = CodeBlock.of("null"))
+                        GenerateProp(name = "bar", type = StringType.nullable, defaultValue = CodeBlock.of("null"))
                     )
                 )
                 .build()

@@ -1,10 +1,10 @@
 package family.amma.deep_link.generator.fileSpec.common
 
 import com.squareup.kotlinpoet.*
+import family.amma.deep_link.generator.entity.*
+import family.amma.deep_link.generator.entity.StringTemplatesFormat
 import family.amma.deep_link.generator.entity.Uri
 import family.amma.deep_link.generator.entity.header
-import family.amma.deep_link.generator.entity.pathSegments
-import family.amma.deep_link.generator.entity.trimPartToParameters
 import family.amma.deep_link.generator.ext.listProp
 import family.amma.deep_link.generator.ext.overrideValProp
 import family.amma.deep_link.generator.ext.toListCodeBlock
@@ -68,7 +68,7 @@ object GeneratedDeepLink : SuperInterface<PropertySpec>(
             .builder(className.packageName, className.simpleName)
             .addType(
                 TypeSpec.interfaceBuilder(className.simpleName)
-                    .addProperty(PropertySpec.builder(DEEP_LINK_URI_PROP_NAME, String::class).build())
+                    .addProperty(PropertySpec.builder(DEEP_LINK_URI_PROP_NAME, StringType.typeName).build())
                     .build()
             )
             .indent(indent)
@@ -76,8 +76,8 @@ object GeneratedDeepLink : SuperInterface<PropertySpec>(
 
     override fun props(uri: Uri): PropertySpec =
         PropertySpec
-            .builder(DEEP_LINK_URI_PROP_NAME, String::class)
-            .initializer("%P", uri)
+            .builder(DEEP_LINK_URI_PROP_NAME, StringType.typeName)
+            .initializer(StringTemplatesFormat.value, uri)
             .addModifiers(KModifier.OVERRIDE)
             .build()
 }

@@ -1,15 +1,12 @@
 package family.amma.deep_link.generator.parser
 
-import family.amma.deep_link.generator.entity.NavParserErrors.sameSanitizedNameDeepLinks
+import family.amma.deep_link.generator.parser.NavParserErrors.sameSanitizedNameDeepLinks
 import family.amma.deep_link.generator.ext.toCamelCase
-import family.amma.deep_link.generator.ext.showError
 import com.squareup.kotlinpoet.ClassName
 import family.amma.deep_link.generator.entity.*
 import family.amma.deep_link.generator.entity.DeepLink
 import family.amma.deep_link.generator.entity.DestArgument
-import family.amma.deep_link.generator.entity.NavParserErrors
 import family.amma.deep_link.generator.entity.ParsedDestination
-import family.amma.deep_link.generator.entity.XmlPosition
 import family.amma.deep_link.generator.main.*
 import kotlinx.coroutines.CoroutineDispatcher
 

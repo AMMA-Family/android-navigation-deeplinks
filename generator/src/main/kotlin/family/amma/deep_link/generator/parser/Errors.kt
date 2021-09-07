@@ -1,6 +1,15 @@
-package family.amma.deep_link.generator.entity
+package family.amma.deep_link.generator.parser
 
+import family.amma.deep_link.generator.entity.DeepLink
 import family.amma.deep_link.generator.main.NavType
+import java.io.File
+
+internal fun showError(message: String, position: XmlPosition): Nothing {
+    val path = position.name
+    val line = position.line
+    val column = position.column
+    throw IllegalStateException("\"$path:$line:$column (${File(path).name}:$line): \nError: $message")
+}
 
 internal object NavParserErrors {
     const val UNKNOWN_DESTINATION = "Destination with must contain 'id' attribute."

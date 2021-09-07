@@ -90,7 +90,7 @@ private fun toProp(name: String, destinationArgs: List<DestArgument>, couldBeNul
         ?.let { arg ->
             GenerateProp(
                 name = name,
-                typeName = if (couldBeNull) arg.type.nullable else arg.type.typeName,
+                type = if (couldBeNull) arg.type.nullable else arg.type.typeName,
                 defaultValue = arg.defaultValue?.write()
             )
         }

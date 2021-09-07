@@ -4,6 +4,7 @@ import com.squareup.kotlinpoet.*
 import family.amma.deep_link.generator.entity.GenerateProp
 import family.amma.deep_link.generator.fileSpec.common.GeneratedDeepLink
 import family.amma.deep_link.generator.main.NavType
+import family.amma.deep_link.generator.main.nullable
 
 /**
  * Example:
@@ -58,12 +59,12 @@ internal fun TypeSpec.Builder.addConstructorWithProps(props: List<GenerateProp>)
     val constructorBuilder = FunSpec.constructorBuilder()
     for (prop in props) {
         constructorBuilder.addParameter(
-            ParameterSpec.builder(prop.name, prop.typeName)
+            ParameterSpec.builder(prop.name, prop.type)
                 .also { prop.defaultValue?.let(it::defaultValue) }
                 .build()
         )
         addProperty(
-            PropertySpec.builder(prop.name, prop.typeName)
+            PropertySpec.builder(prop.name, prop.type)
                 .initializer(prop.name)
                 .build()
         )
@@ -87,19 +88,19 @@ internal fun TypeSpec.Builder.addConstructorWithProps(props: List<GenerateProp>)
 internal inline fun <reified T> toListCodeBlock(type: NavType, list: List<T>): CodeBlock =
     CodeBlock
         .builder()
-        .addStatement("listOf(${list.joinToString(prefix = "", postfix = "") { type.format }})", *list.toTypedArray())
+        .addStatement("listOf(${list.joinToString(prefix = "", postfix = "") { type.format.value }})", *list.toTypedArray())
         .build()
 
 internal fun constValProp(name: String, type: NavType, value: String) =
     PropertySpec
         .builder(name, type.typeName, KModifier.CONST)
-        .initializer(type.format, value)
+        .initializer(type.format.value, value)
         .build()
 
 internal fun overrideValProp(name: String, type: NavType, value: String?) =
     PropertySpec
-        .builder(name, type.typeName.let { if (value == null) it.copy(nullable = true) else it }, KModifier.OVERRIDE)
-        .initializer(type.format, value)
+        .builder(name, if (value == null) type.nullable else type.typeName, KModifier.OVERRIDE)
+        .initializer(type.format.value, value)
         .build()
 
 internal fun listProp(name: String, type: ParameterizedTypeName, value: CodeBlock, vararg modifiers: KModifier) =

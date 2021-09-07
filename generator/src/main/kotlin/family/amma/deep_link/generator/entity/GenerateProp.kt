@@ -14,6 +14,6 @@ import family.amma.deep_link.generator.main.NavType
  * ```
  * @param defaultValue `null` if no default value exists.
  */
-internal data class GenerateProp(val name: String, val typeName: TypeName, val defaultValue: CodeBlock?) {
+internal data class GenerateProp(val name: String, val type: TypeName, val defaultValue: CodeBlock?) {
     constructor(name: String, type: NavType, defaultValue: CodeBlock?) : this(name, type.typeName, defaultValue)
 }

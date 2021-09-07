@@ -1,8 +1,8 @@
 package family.amma.deep_link.generator.entity
 
 import family.amma.deep_link.generator.main.NavType
-import family.amma.deep_link.generator.main.NullValue
-import family.amma.deep_link.generator.main.WriteableValue
+import family.amma.deep_link.generator.parser.NullValue
+import family.amma.deep_link.generator.parser.WriteableValue
 
 /**
  * Argument of destination in xml.

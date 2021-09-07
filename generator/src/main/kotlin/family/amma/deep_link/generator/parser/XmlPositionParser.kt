@@ -1,7 +1,5 @@
 package family.amma.deep_link.generator.parser
 
-import family.amma.deep_link.generator.entity.XmlPosition
-import family.amma.deep_link.generator.ext.showError
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import org.xmlpull.v1.XmlPullParser
