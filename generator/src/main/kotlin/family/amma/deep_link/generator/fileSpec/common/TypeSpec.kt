@@ -2,7 +2,6 @@ package family.amma.deep_link.generator.fileSpec.common
 
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import family.amma.deep_link.generator.main.GeneratorParams
 import family.amma.deep_link.generator.entity.*
@@ -33,13 +32,13 @@ internal fun deepLinkTypeSpec(
                 builder.addType(
                     TypeSpec.companionObjectBuilder()
                         .addSuperinterface(DeepLinkAdditionalInfo.className)
-                        .addProperties(DeepLinkAdditionalInfo.parsedUriProps(deepLink.uri))
+                        .addProperties(DeepLinkAdditionalInfo.props(deepLink.uri))
                         .build()
                 )
             } else {
                 builder
                     .addSuperinterface(DeepLinkAdditionalInfo.className)
-                    .addProperties(DeepLinkAdditionalInfo.parsedUriProps(deepLink.uri))
+                    .addProperties(DeepLinkAdditionalInfo.props(deepLink.uri))
             }
         } else {
             builder
@@ -72,7 +71,7 @@ private fun dataClassDeepLinkTypeSpecBuilder(
         .addModifiers(KModifier.DATA)
         .addConstructorWithProps(toPropList(deepLink.args, destinationArgs))
         .let { parent?.let(it::superclass) ?: it }
-        .addProperty(uriProperty(deepLink.uri.replace("{", "\${")))
+        .addProperty(GeneratedDeepLink.props(deepLink.uri.replace("{", "\${")))
 
 /** Mapping deep link arguments to generation props. */
 private fun toPropList(deepLinkArgs: List<DeepLinkArg>, destinationArgs: List<DestArgument>): List<GenerateProp> =
@@ -101,11 +100,4 @@ private fun objectDeepLinkTypeSpecBuilder(parent: ClassName?, className: ClassNa
     TypeSpec
         .objectBuilder(className)
         .let { parent?.let(it::superclass) ?: it }
-        .addProperty(uriProperty(deepLink.uri))
-
-private fun uriProperty(uri: Uri) =
-    PropertySpec
-        .builder("uri", String::class)
-        .initializer("%P", uri)
-        .addModifiers(KModifier.OVERRIDE)
-        .build()
+        .addProperty(GeneratedDeepLink.props(deepLink.uri))

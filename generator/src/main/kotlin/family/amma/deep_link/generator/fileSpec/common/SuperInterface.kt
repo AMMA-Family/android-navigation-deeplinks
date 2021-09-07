@@ -12,13 +12,17 @@ import family.amma.deep_link.generator.main.StringType
 import family.amma.deep_link.generator.main.list
 import family.amma.deep_link.generator.main.nullable
 
-sealed class SuperInterface(val className: ClassName) {
+private const val commonPackageName = "deep_link"
+
+sealed class SuperInterface<T>(val className: ClassName) {
     abstract fun fileSpec(): FileSpec
+    abstract fun props(uri: Uri): T
 }
 
 /** Common interface for all additional information. */
-object DeepLinkAdditionalInfo : SuperInterface(className = ClassName("deep_link", "DeepLinkAdditionalInfo")) {
-
+object DeepLinkAdditionalInfo : SuperInterface<List<PropertySpec>>(
+    className = ClassName(commonPackageName, "DeepLinkAdditionalInfo")
+) {
     private const val DEEP_LINK_PROTOCOL_PROP_NAME = "protocol"
     private const val DEEP_LINK_HOST_PROP_NAME = "host"
     private const val DEEP_LINK_PATH_SEGMENTS_PROP_NAME = "pathSegments"
@@ -38,8 +42,7 @@ object DeepLinkAdditionalInfo : SuperInterface(className = ClassName("deep_link"
             .build()
     }
 
-    /** @return list of props with additional info. */
-    internal fun parsedUriProps(uri: Uri): List<PropertySpec> {
+    override fun props(uri: Uri): List<PropertySpec> {
         val correctUri = uri.trimPartToParameters()
         val header = correctUri.header()
         return listOfNotNull(
@@ -55,11 +58,11 @@ object DeepLinkAdditionalInfo : SuperInterface(className = ClassName("deep_link"
 }
 
 /** Common interface for all deep links. */
-object GeneratedDeepLink : SuperInterface(className = ClassName("deep_link", "GeneratedDeepLink")) {
-
+object GeneratedDeepLink : SuperInterface<PropertySpec>(
+    className = ClassName(commonPackageName, "GeneratedDeepLink")
+) {
     private const val DEEP_LINK_URI_PROP_NAME = "uri"
 
-    /** Common interface for all deep links. */
     override fun fileSpec(): FileSpec =
         FileSpec
             .builder(className.packageName, className.simpleName)
@@ -71,4 +74,10 @@ object GeneratedDeepLink : SuperInterface(className = ClassName("deep_link", "Ge
             .indent(indent)
             .build()
 
+    override fun props(uri: Uri): PropertySpec =
+        PropertySpec
+            .builder(DEEP_LINK_URI_PROP_NAME, String::class)
+            .initializer("%P", uri)
+            .addModifiers(KModifier.OVERRIDE)
+            .build()
 }
